@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1 removeObjectAtIndex和removeObject的不同之处removeObjectAtIndex: Removes the object at index . To fill the gap, all elements beyond index are moved by subtracting 1 from their index.  Important:Important R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NSMutableArray中删除对象知多少">
+<meta property="og:url" content="http://yoursite.com/2016/07/31/2016-07-31-NSMutableArray%E4%B8%AD%E5%88%A0%E9%99%A4%E5%AF%B9%E8%B1%A1%E7%9F%A5%E5%A4%9A%E5%B0%91/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="1 removeObjectAtIndex和removeObject的不同之处removeObjectAtIndex: Removes the object at index . To fill the gap, all elements beyond index are moved by subtracting 1 from their index.  Important:Important R">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-07-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-15T09:11:41.586Z">
+<meta property="article:author" content="宿于松下">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2016/07/31/2016-07-31-NSMutableArray%E4%B8%AD%E5%88%A0%E9%99%A4%E5%AF%B9%E8%B1%A1%E7%9F%A5%E5%A4%9A%E5%B0%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>NSMutableArray中删除对象知多少 | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">19</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/31/2016-07-31-NSMutableArray%E4%B8%AD%E5%88%A0%E9%99%A4%E5%AF%B9%E8%B1%A1%E7%9F%A5%E5%A4%9A%E5%B0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NSMutableArray中删除对象知多少
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-07-31 00:00:00" itemprop="dateCreated datePublished" datetime="2016-07-31T00:00:00+08:00">2016-07-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 17:11:41" itemprop="dateModified" datetime="2021-08-15T17:11:41+08:00">2021-08-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="1-removeObjectAtIndex和removeObject的不同之处"><a href="#1-removeObjectAtIndex和removeObject的不同之处" class="headerlink" title="1 removeObjectAtIndex和removeObject的不同之处"></a>1 removeObjectAtIndex和removeObject的不同之处</h3><p><code>removeObjectAtIndex:</code></p>
+<pre><code>Removes the object at index .
+To fill the gap, all elements beyond index are moved by subtracting 1 from their index.
+
+Important:Important
+Raises an exception NSRangeException if index is beyond the end of the array.</code></pre>
+<p>删除指定NSMutableArray中指定index的对象，注意index不能越界。</p>
+<p><code>removeObject:</code></p>
+<pre><code>Removes all occurrences in the array of a given object.
+This method uses indexOfObject: to locate matches and then removes them by using removeObjectAtIndex:. Thus, matches are determined on the basis of an object’s response to the isEqual: message. If the array does not contain anObject, the method has no effect (although it does incur the overhead of searching the contents).</code></pre>
+<p>删除NSMutableArray中所有isEqual:待删对象的对象</p>
+<p>从API文档可以看出，两者之间的主要区别是<code>removeObjectAtIndex:</code>最多只能删除一个对象，而<code>removeObject:</code>可以删除多个对象（只要符合<code>isEqual:</code>的都删除掉）。</p>
+<h3 id="2-在NSMutableArray循环中删除对象"><a href="#2-在NSMutableArray循环中删除对象" class="headerlink" title="2 在NSMutableArray循环中删除对象"></a>2 在NSMutableArray循环中删除对象</h3><h4 id="2-1-可能多删的做法"><a href="#2-1-可能多删的做法" class="headerlink" title="2.1 可能多删的做法"></a>2.1 可能多删的做法</h4><p>删除数组中的第一个@”remove”</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)removeObjectsUseFor</span><br><span class="line">&#123;   </span><br><span class="line">    <span class="built_in">NSMutableArray</span> *contents = [@[<span class="string">@&quot;how&quot;</span>, <span class="string">@&quot;to&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;object&quot;</span>] mutableCopy];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = <span class="number">0</span>; i != contents.count; ++i) &#123;</span><br><span class="line">        <span class="built_in">NSString</span> *var = contents[i];</span><br><span class="line">        <span class="keyword">if</span> ([var isEqualToString:<span class="string">@&quot;remove&quot;</span>]) &#123;</span><br><span class="line">            [contents removeObject:var];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, contents);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2016-07-31 21:14:13.541 RemoveObject[5862:310398] (</span><br><span class="line">    how,</span><br><span class="line">    to,</span><br><span class="line">    object</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>从<code>removeObject:</code>的说明中可以看出，<code>removeObject:</code>不仅删除该对象本身，而且删除NSMutableArray中<em>所有</em><code>isEqual:</code>待删对象的对象</p>
+<h4 id="2-2-可能漏删的做法"><a href="#2-2-可能漏删的做法" class="headerlink" title="2.2 可能漏删的做法"></a>2.2 可能漏删的做法</h4><p>删除数组中所有的@”remove”</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)removeObjectsUseFor</span><br><span class="line">&#123;   </span><br><span class="line">    <span class="built_in">NSMutableArray</span> *contents = [@[<span class="string">@&quot;how&quot;</span>, <span class="string">@&quot;to&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;object&quot;</span>] mutableCopy];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = <span class="number">0</span>; i != contents.count; ++i) &#123;</span><br><span class="line">        <span class="built_in">NSString</span> *var = contents[i];</span><br><span class="line">        <span class="keyword">if</span> ([var isEqualToString:<span class="string">@&quot;remove&quot;</span>]) &#123;</span><br><span class="line">            [contents removeObjectAtIndex:i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, contents);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2016-07-31 21:19:59.615 RemoveObject[5886:315162] (</span><br><span class="line">    how,</span><br><span class="line">    to,</span><br><span class="line">    remove,</span><br><span class="line">    object</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-引发崩溃的做法"><a href="#2-3-引发崩溃的做法" class="headerlink" title="2.3 引发崩溃的做法"></a>2.3 引发崩溃的做法</h4><p>删除数组中所有的@”remove”</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)removeObjectsUseForIn</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableArray</span> *contents = [@[<span class="string">@&quot;how&quot;</span>, <span class="string">@&quot;to&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;object&quot;</span>] mutableCopy];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSString</span> *var <span class="keyword">in</span> contents) &#123;</span><br><span class="line">        <span class="keyword">if</span> ([var isEqualToString:<span class="string">@&quot;remove&quot;</span>]) &#123;</span><br><span class="line">            [contents removeObject:var];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, contents);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：崩溃</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2016-07-31 21:27:40.337 RemoveObject[5915:321407] *** Terminating app due to uncaught exception &#39;NSGenericException&#39;, reason: &#39;*** Collection &lt;__NSArrayM: 0x7f9388c95580&gt; was mutated while being enumerated.&#39;</span><br></pre></td></tr></table></figure>
+
+<p>不要在for in 循环中删除数组内部对象。</p>
+<h4 id="2-4-正确但别扭的做法"><a href="#2-4-正确但别扭的做法" class="headerlink" title="2.4 正确但别扭的做法"></a>2.4 正确但别扭的做法</h4><p>删除数组中所有的@”remove”</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)removeObjectsReversed</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableArray</span> *contents = [@[<span class="string">@&quot;how&quot;</span>, <span class="string">@&quot;to&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;object&quot;</span>] mutableCopy];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = contents.count - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">        <span class="built_in">NSString</span> *var = contents[i];</span><br><span class="line">        <span class="keyword">if</span> ([var isEqualToString:<span class="string">@&quot;remove&quot;</span>]) &#123;</span><br><span class="line">            [contents removeObjectAtIndex:i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, contents);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2016-07-31 21:31:37.655 RemoveObject[5934:325316] (</span><br><span class="line">    how,</span><br><span class="line">    to,</span><br><span class="line">    object</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>倒序删除，正确但有点别扭！</p>
+<h4 id="2-5-优雅的做法"><a href="#2-5-优雅的做法" class="headerlink" title="2.5 优雅的做法"></a>2.5 优雅的做法</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)removeObjectsUseEnumration</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableArray</span> *contents = [@[<span class="string">@&quot;how&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;to&quot;</span>, <span class="string">@&quot;remove&quot;</span>, <span class="string">@&quot;object&quot;</span>] mutableCopy];</span><br><span class="line">    <span class="built_in">NSIndexSet</span> *indexSet =</span><br><span class="line">        [contents indexesOfObjectsPassingTest:^<span class="built_in">BOOL</span>(<span class="built_in">NSString</span> *  _Nonnull var, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">            <span class="keyword">return</span> [var isEqualToString:<span class="string">@&quot;remove&quot;</span>];</span><br><span class="line">        &#125;];</span><br><span class="line">    [contents removeObjectsAtIndexes:indexSet];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, indexSet);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, contents);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2016-07-31 22:10:42.404 RemoveObject[6014:338210] &lt;NSIndexSet: 0x7fb73a516040&gt;[number of indexes: 2 (in 2 ranges), indexes: (1 3)]</span><br><span class="line">2016-07-31 22:10:42.404 RemoveObject[6014:338210] (</span><br><span class="line">    how,</span><br><span class="line">    to,</span><br><span class="line">    object</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>先通过<code>indexesOfObjectsPassingTest:</code>把待删除对象的index找出来，再调用<code>removeObjectsAtIndexes:</code>进行一次性删除。</p>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3 总结"></a>3 总结</h3><ol>
+<li>不建议在NSMutableArray循环中使用<code>removeObject:</code>删除该NSMutableArray内部对象，此举可能引发误删，如2.1所示；</li>
+<li>不建议在NSMutableArray的for in 循环中删除对象，此举可能引发崩溃，如2.3所示；</li>
+<li>建议删除NSMutableArray内部对象时，先拿到待删对象的index，再进行一次性删除，如2.5所示。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/07/24/2016-07-24-iOS%20frame%E3%80%81bounds%E3%80%81anchorPoint%E3%80%81position%E4%BB%A5%E5%8F%8Atransform/" rel="prev" title="iOS frame、bounds、anchorPoint、position以及transform">
+      <i class="fa fa-chevron-left"></i> iOS frame、bounds、anchorPoint、position以及transform
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/03/2016-08-03-%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/" rel="next" title="自动布局与Masonry使用注意事项">
+      自动布局与Masonry使用注意事项 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-removeObjectAtIndex%E5%92%8CremoveObject%E7%9A%84%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84"><span class="nav-number">1.</span> <span class="nav-text">1 removeObjectAtIndex和removeObject的不同之处</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%9C%A8NSMutableArray%E5%BE%AA%E7%8E%AF%E4%B8%AD%E5%88%A0%E9%99%A4%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">2 在NSMutableArray循环中删除对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E5%8F%AF%E8%83%BD%E5%A4%9A%E5%88%A0%E7%9A%84%E5%81%9A%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 可能多删的做法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E5%8F%AF%E8%83%BD%E6%BC%8F%E5%88%A0%E7%9A%84%E5%81%9A%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 可能漏删的做法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-%E5%BC%95%E5%8F%91%E5%B4%A9%E6%BA%83%E7%9A%84%E5%81%9A%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 引发崩溃的做法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-%E6%AD%A3%E7%A1%AE%E4%BD%86%E5%88%AB%E6%89%AD%E7%9A%84%E5%81%9A%E6%B3%95"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 正确但别扭的做法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-%E4%BC%98%E9%9B%85%E7%9A%84%E5%81%9A%E6%B3%95"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 优雅的做法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">3 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

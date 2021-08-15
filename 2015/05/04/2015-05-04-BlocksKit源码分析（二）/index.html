@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1引言在《BlocksKit源码分析（一）》中我们分析了BlocksKit源码组织结构以及第一部分Core的源码。在这里我们接着分析BlocksKit第二部分——DynamicDelegate（动态代理）。所谓动态代理，听起来挺玄乎。实际一言以蔽之，就是把delegate转为block的手段。 2动态代理样例我们先从一个例子来看看动态代理的使用方式： 12345678910111213141516">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BlocksKit源码分析（二）">
+<meta property="og:url" content="http://yoursite.com/2015/05/04/2015-05-04-BlocksKit%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="1引言在《BlocksKit源码分析（一）》中我们分析了BlocksKit源码组织结构以及第一部分Core的源码。在这里我们接着分析BlocksKit第二部分——DynamicDelegate（动态代理）。所谓动态代理，听起来挺玄乎。实际一言以蔽之，就是把delegate转为block的手段。 2动态代理样例我们先从一个例子来看看动态代理的使用方式： 12345678910111213141516">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/BlocksKit2/1.png">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/BlocksKit2/2.png">
+<meta property="article:published_time" content="2015-05-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-15T09:11:41.585Z">
+<meta property="article:author" content="宿于松下">
+<meta property="article:tag" content="BlocksKit">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/assets/img/postImage/BlocksKit2/1.png">
+
+<link rel="canonical" href="http://yoursite.com/2015/05/04/2015-05-04-BlocksKit%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>BlocksKit源码分析（二） | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">19</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/05/04/2015-05-04-BlocksKit%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BlocksKit源码分析（二）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-05-04 00:00:00" itemprop="dateCreated datePublished" datetime="2015-05-04T00:00:00+08:00">2015-05-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 17:11:41" itemprop="dateModified" datetime="2021-08-15T17:11:41+08:00">2021-08-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" itemprop="url" rel="index"><span itemprop="name">iOS源码分析</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1引言"><a href="#1引言" class="headerlink" title="1引言"></a>1引言</h2><p>在<strong>《BlocksKit源码分析（一）》</strong>中我们分析了BlocksKit源码组织结构以及第一部分Core的源码。在这里我们接着分析BlocksKit第二部分——DynamicDelegate（动态代理）。所谓动态代理，听起来挺玄乎。实际一言以蔽之，就是把delegate转为block的手段。</p>
+<h2 id="2动态代理样例"><a href="#2动态代理样例" class="headerlink" title="2动态代理样例"></a>2动态代理样例</h2><p>我们先从一个例子来看看动态代理的使用方式：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">IBAction</span>) annoyUser</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 创建一个alert view</span></span><br><span class="line">    <span class="built_in">UIAlertView</span> *alertView = [[<span class="built_in">UIAlertView</span> alloc]</span><br><span class="line">                              initWithTitle:<span class="string">@&quot;Hello World!&quot;</span></span><br><span class="line">                              message:<span class="string">@&quot;This alert&#x27;s delegate is implemented using blocks. That&#x27;s so cool!&quot;</span></span><br><span class="line">                              delegate:<span class="literal">nil</span></span><br><span class="line">                              cancelButtonTitle:<span class="string">@&quot;Meh.&quot;</span></span><br><span class="line">                              otherButtonTitles:<span class="string">@&quot;Woo!&quot;</span>, <span class="literal">nil</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取该alert view的动态代理对象（什么是动态代理对象稍后会说）</span></span><br><span class="line">    A2DynamicDelegate *dd = alertView.bk_dynamicDelegate;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 调用动态代理对象的 - (void)implementMethod:(SEL)selector withBlock:(id)block;方法，使得SEL映射一个block对象(假设叫做block1)</span></span><br><span class="line">    [dd implementMethod:<span class="keyword">@selector</span>(alertViewShouldEnableFirstOtherButton:) withBlock:^(<span class="built_in">UIAlertView</span> *alertView) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;Message: %@&quot;</span>, alertView.message);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 同上，让映射-alertView:willDismissWithButtonIndex:的SEL到另外一个block对象(假设叫做block2)</span></span><br><span class="line">    [dd implementMethod:<span class="keyword">@selector</span>(alertView:willDismissWithButtonIndex:) withBlock:^(<span class="built_in">UIAlertView</span> *alertView, <span class="built_in">NSInteger</span> buttonIndex) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;You pushed button #%d (%@)&quot;</span>, buttonIndex, [alertView buttonTitleAtIndex:buttonIndex]);</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 把alertView的delegate设置为动态代理</span></span><br><span class="line">    alertView.delegate = dd;</span><br><span class="line">    </span><br><span class="line">    [alertView show];</span><br><span class="line">&#125;</span><br><span class="line"> <span class="comment">// 那么，alert view在显示的时候收到alertViewShouldEnableFirstOtherButton:消息调用block1；alert view在消失的时候收到alertView:willDismissWithButtonIndex:消息，调用block2</span></span><br></pre></td></tr></table></figure>
+
+<p>从上面的代码我们可以直观地看到：dd（动态代理对象）直接被设置为alert view的delegate对象，那么该alert view的UIAlertViewDelegate消息直接传递向给了dd。然后dd又通过某种方式把对应的SEL调用转为对应的block调用。我们又可以作出如下猜测：</p>
+<ol>
+<li>dd内部可能有个dic一样的数据结构，key可能是SEL，value可能是与之对应的block，通过implementMethod:withBlock:这个方法把SEL和block以键值对的形式建立起dic映射</li>
+<li>Host对象（本例是alertView）向dd发delegate消息的时候传递了SEL，dd在内部的dic数据结构查找对应的block，找到后，调用该block。</li>
+</ol>
+<p>基本思路是这样的，but还有两个问题需要解决：</p>
+<ol>
+<li>dd（动态代理对象）是如何创建的？</li>
+<li>如UIAlertViewDelegate这样的各种delegate有不同的消息，任意一个消息都可能发给dd，dd是如何能接受任意消息的，显然实现每个消息是不现实的。</li>
+</ol>
+<h2 id="3消息转发机制"><a href="#3消息转发机制" class="headerlink" title="3消息转发机制"></a>3消息转发机制</h2><p>我们先来回答第二个问题，即动态代理是如何能接受任意消息的。<br> 当一个object收到它没实现的消息的时候，通常会发生如下的情况。</p>
+<ol>
+<li><p>首先看是否为该 selector 提供了动态方法决议机制,如果提供了则转到2;如果没有提供则转到3;</p>
+</li>
+<li><p>如果动态方法决议真正为该 selector 提供了实现,那么就调用该实现,完成消息发送流程,消息转发就不会进行了;如果没有提供,则转到 3;</p>
+</li>
+<li><p>其次看是否为该 selector 提供了消息转发机制,如果提供了消息了则进行消息转发,此时,无论消息 转发是怎样实现的,程序均不会 crash。(因为消息调用的控制权完全交给消息转发机制处理,即使消息转发并没有做任何事情,运行也不会有错误,编译器更不会有错误提示。);如果没提供消息转发机制, 则转到 4;</p>
+</li>
+<li><p>运行报错:无法识别的 selector,程序 crash;</p>
+<p>通过以上描述我们可以知道。dd（A2DynamicDelegate类）支持任意消息发送，不是用了消息决议就是用了消息转发。实际上通过代码我们可以看出 A2DynamicDelegate是继承自NSProxy类，该类是专门做消息转发的。继承自该类的类必须要实现- (void)forwardInvocation:(NSInvocation *)outerInv方法。因为该方法是当该类的对象收到无法识别的消息的时候调用的方法。所以dd消息映射流程大概是这样的：当dd收到无法识别的消息时会调用forwardInvocation，该函数的参数outerInv可以拿到对应消息的SEL,再通过SEL在再内部的dic里面找到对应的block进行调用。（简要思路）</p>
+</li>
+</ol>
+<h2 id="4动态代理对象的创建"><a href="#4动态代理对象的创建" class="headerlink" title="4动态代理对象的创建"></a>4动态代理对象的创建</h2><p>A2DynamicDelegate这种对象是如何创建的？为什么从代码里面看dd（A2DynamicDelegate）好像是alertView的一个property。<br> 实际上dd是通过NSObject的(A2DynamicDelegate)分类来实现的。该分类用关联对象的方法，把protocal和A2DynamicDelegate对象关联起来。使得相应的protocal有对应的A2DynamicDelegate对象。某个类的bk_dynamicDelegate实际上是查找该类对应delegate的protocal，再根据这个protocal找到对应的A2DynamicDelegate对象。如果找不到A2DynamicDelegate对象就创建一个关联起来。比如alertView.bk_dynamicDelegate;会查找alertView的delegate UIAlertViewDelegate protocal所关联的对象，如果没有找到就创建一个，并且做关联。<br> 相关代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// File:NSObject+A2DynamicDelegate.m</span></span><br><span class="line"> - (<span class="keyword">id</span>)bk_dynamicDelegateWithClass:(Class)cls forProtocol:(Protocol *)protocol</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Storing the dynamic delegate as an associated object of the delegating</span></span><br><span class="line"><span class="comment">     * object not only allows us to later retrieve the delegate, but it also</span></span><br><span class="line"><span class="comment">     * creates a strong relationship to the delegate. Since delegates are weak</span></span><br><span class="line"><span class="comment">     * references on the part of the delegating object, a dynamic delegate</span></span><br><span class="line"><span class="comment">     * would be deallocated immediately after its declaring scope ends.</span></span><br><span class="line"><span class="comment">     * Therefore, this strong relationship is required to ensure that the</span></span><br><span class="line"><span class="comment">     * delegate&#x27;s lifetime is at least as long as that of the delegating object.</span></span><br><span class="line"><span class="comment">     **/</span></span><br><span class="line"></span><br><span class="line">    __block A2DynamicDelegate *dynamicDelegate;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">dispatch_sync</span>(a2_backgroundQueue(), ^&#123;</span><br><span class="line">        dynamicDelegate = objc_getAssociatedObject(<span class="keyword">self</span>, (__bridge <span class="keyword">const</span> <span class="keyword">void</span> *)protocol);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!dynamicDelegate)</span><br><span class="line">        &#123;</span><br><span class="line">            dynamicDelegate = [[cls alloc] initWithProtocol:protocol];</span><br><span class="line">            objc_setAssociatedObject(<span class="keyword">self</span>, (__bridge <span class="keyword">const</span> <span class="keyword">void</span> *)protocol, dynamicDelegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dynamicDelegate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5代码设计"><a href="#5代码设计" class="headerlink" title="5代码设计"></a>5代码设计</h2><p>A2DynamicDelegate是动态代理类，NSObject_A2DynamicDelegate是NSObject分类用来创建动态代理对象。A2BlockInvocation这个类我们之前没有说过，它是block的一层封装。A2DynamicDelegate里面的字典数据结构装得不是纯粹的block，而是A2BlockInvocation对象。</p>
+<p>相关类图如下：<br><img src="/assets/img/postImage/BlocksKit2/1.png" alt="类图"></p>
+<p>相关序列图如下：<br><img src="/assets/img/postImage/BlocksKit2/2.png" alt="序列图"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/BlocksKit/" rel="tag"># BlocksKit</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2014/09/26/2014-09-26-iOS%20Nimbus%E6%A1%86%E6%9E%B6tableview%E9%83%A8%E5%88%86%E8%A7%A3%E8%AF%BB(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/" rel="prev" title="iOS Nimbus框架tableview部分解读(CSDN早期博客)">
+      <i class="fa fa-chevron-left"></i> iOS Nimbus框架tableview部分解读(CSDN早期博客)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2015/05/04/2015-05-03-BlocksKit%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89/" rel="next" title="BlocksKit源码分析（一）">
+      BlocksKit源码分析（一） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%A0%B7%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">2动态代理样例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91%E6%9C%BA%E5%88%B6"><span class="nav-number">3.</span> <span class="nav-text">3消息转发机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">4.</span> <span class="nav-text">4动态代理对象的创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5%E4%BB%A3%E7%A0%81%E8%AE%BE%E8%AE%A1"><span class="nav-number">5.</span> <span class="nav-text">5代码设计</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1 理解自身内容尺寸约束与抗压抗拉自身内容尺寸约束:一般来说，要确定一个视图的精确位置，至少需要4个布局约束（以确定水平位置x、垂直位置y、宽度w和高度h）。但是，某些用来展现内容的用户控件，例如文本控件UILabel、按钮UIButton、图片视图UIImageView等，它们具有自身内容尺寸（Intrinsic Content Size），此类用户控件会根据自身内容尺寸添加布局约束。也就是说，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自动布局与Masonry使用注意事项">
+<meta property="og:url" content="http://yoursite.com/2016/08/03/2016-08-03-%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="1 理解自身内容尺寸约束与抗压抗拉自身内容尺寸约束:一般来说，要确定一个视图的精确位置，至少需要4个布局约束（以确定水平位置x、垂直位置y、宽度w和高度h）。但是，某些用来展现内容的用户控件，例如文本控件UILabel、按钮UIButton、图片视图UIImageView等，它们具有自身内容尺寸（Intrinsic Content Size），此类用户控件会根据自身内容尺寸添加布局约束。也就是说，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/1.jpg">
+<meta property="article:published_time" content="2016-08-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-15T09:11:41.586Z">
+<meta property="article:author" content="宿于松下">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/assets/img/postImage/%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/1.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2016/08/03/2016-08-03-%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>自动布局与Masonry使用注意事项 | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">19</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/03/2016-08-03-%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          自动布局与Masonry使用注意事项
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-08-03 00:00:00" itemprop="dateCreated datePublished" datetime="2016-08-03T00:00:00+08:00">2016-08-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 17:11:41" itemprop="dateModified" datetime="2021-08-15T17:11:41+08:00">2021-08-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="1-理解自身内容尺寸约束与抗压抗拉"><a href="#1-理解自身内容尺寸约束与抗压抗拉" class="headerlink" title="1 理解自身内容尺寸约束与抗压抗拉"></a>1 理解自身内容尺寸约束与抗压抗拉</h3><pre><code>自身内容尺寸约束:一般来说，要确定一个视图的精确位置，至少需要4个布局约束（以确定水平位置x、垂直位置y、宽度w和高度h）。但是，某些用来展现内容的用户控件，例如文本控件UILabel、按钮UIButton、图片视图UIImageView等，它们具有自身内容尺寸（Intrinsic Content Size），此类用户控件会根据自身内容尺寸添加布局约束。也就是说，如果开发者没有显式给出其宽度或者高度约束，则其自动添加的自身内容约束将会起作用。因此看似“缺失”约束，实际上并非如此。</code></pre>
+<p><em>关于自身内容尺寸约束，简单来说就是某些用来展现内容的用户控件，它们会根据自身内容尺寸添加布局约束。</em></p>
+<pre><code>自身内容尺寸约束的抗挤压与抗拉抻效果。弹簧会有自身固有长度，当有外力作用时，弹簧会抵抗外力作用，尽量接近固有长度。
+抗拉抻：当外力拉长弹簧时，弹簧长度大于固有长度，且产生向内收的力阻止外力拉抻，且尽量维持长度接近自身固有长度。 
+抗挤压：当外力挤压弹簧时，弹簧长度小于固有长度，且产生向外顶的力阻止外力挤压，且尽量维持长度接近自身固有长度。</code></pre>
+<p><em>关于抗压抗拉，就是布局冲突需要牺牲某些控件的某些宽度或者高度约束时，抗压高的控件越不容易被压缩，抗拉高的控件越不容易被拉升。即自身布局对抗外界布局的能力。</em></p>
+<p><strong>样例：</strong></p>
+<p>一种常见的业务场景是用户修改地址，在输入新地址之前先读取用户之前的地址作为填充。UI实现是水平平行的UILabel和UITextField。<br>代码实现如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSString</span> *)aLongAddress</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">@&quot;A long long long long long long long long long address&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)aShortAddress</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">@&quot;A short address&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)sampleCode</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UIView</span> *layoutView = [<span class="built_in">UIView</span> new];</span><br><span class="line">    layoutView.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">200</span>, [<span class="built_in">UIScreen</span> mainScreen].bounds.size.width, <span class="number">100</span>);</span><br><span class="line">    layoutView.backgroundColor = [[<span class="built_in">UIColor</span> alloc] initWithRed:<span class="number">0.5</span> green:<span class="number">0.5</span> blue:<span class="number">0.5</span> alpha:<span class="number">0.5</span>];</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:layoutView];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UILabel</span> *address = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    [layoutView addSubview:address];</span><br><span class="line">    address.text = <span class="string">@&quot;地址:&quot;</span>;</span><br><span class="line">    address.backgroundColor = [<span class="built_in">UIColor</span> blueColor];</span><br><span class="line">    [address mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.centerY.equalTo(layoutView);</span><br><span class="line">        make.left.equalTo(layoutView).offset(<span class="number">10</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UITextField</span> *addressTextField = [[<span class="built_in">UITextField</span> alloc] init];</span><br><span class="line">    [layoutView addSubview:addressTextField];</span><br><span class="line">    addressTextField.returnKeyType = <span class="built_in">UIReturnKeyDone</span>;</span><br><span class="line">    addressTextField.font = [<span class="built_in">UIFont</span> systemFontOfSize:<span class="number">15</span>];</span><br><span class="line">    addressTextField.clearButtonMode = <span class="built_in">UITextFieldViewModeWhileEditing</span>;</span><br><span class="line">    addressTextField.layer.borderWidth = <span class="number">1</span> / [<span class="built_in">UIScreen</span> mainScreen].scale;</span><br><span class="line">    addressTextField.layer.borderColor =  [[[<span class="built_in">UIColor</span> alloc] initWithRed:<span class="number">1</span> green:<span class="number">1</span> blue:<span class="number">0</span> alpha:<span class="number">1</span>] <span class="built_in">CGColor</span>];</span><br><span class="line">    addressTextField.layer.cornerRadius = <span class="number">3</span>;</span><br><span class="line">    addressTextField.text = [<span class="keyword">self</span> aLongAddress];</span><br><span class="line">    [addressTextField mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.height.equalTo(address);</span><br><span class="line">        make.centerY.equalTo(address);</span><br><span class="line">        make.right.equalTo(layoutView.mas_right).offset(<span class="number">-10</span>);</span><br><span class="line">        make.left.equalTo(address.mas_right).offset(<span class="number">10</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此处使用了UILabel的<strong>自身内容尺寸约束</strong>，当<code>houseNumberTextField.text = [self aShortAddress]</code>UI表现正常。</p>
+<p>但，当<code>houseNumberTextField.text = [self aLongAddress]</code>时会出现address UILabel被挤压掉的情况，如下图所示：</p>
+<p><img src="/assets/img/postImage/%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E4%B8%8EMasonry%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/1.jpg" alt="1"></p>
+<p>原因是address Label的<strong>水平抗压缩</strong>没有设置。</p>
+<p>在address Label创建的时候添加如下代码<code>[address setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal]</code>则显示正常。</p>
+<p>另，在某些情况下存在view被拉升，极有可能是没有设置<strong>抗拉升</strong>，此处不一一列举。</p>
+<p>附，抗压抗拉相关API如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- (<span class="built_in">UILayoutPriority</span>)contentHuggingPriorityForAxis:(<span class="built_in">UILayoutConstraintAxis</span>)axis <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">6</span>_0);</span><br><span class="line">- (<span class="keyword">void</span>)setContentHuggingPriority:(<span class="built_in">UILayoutPriority</span>)priority forAxis:(<span class="built_in">UILayoutConstraintAxis</span>)axis <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">6</span>_0);</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">UILayoutPriority</span>)contentCompressionResistancePriorityForAxis:(<span class="built_in">UILayoutConstraintAxis</span>)axis <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">6</span>_0);</span><br><span class="line">- (<span class="keyword">void</span>)setContentCompressionResistancePriority:(<span class="built_in">UILayoutPriority</span>)priority forAxis:(<span class="built_in">UILayoutConstraintAxis</span>)axis <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">6</span>_0);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-NSLayoutConstraint只能修改constant"><a href="#2-NSLayoutConstraint只能修改constant" class="headerlink" title="2 NSLayoutConstraint只能修改constant"></a>2 NSLayoutConstraint只能修改constant</h3><p><code>NSLayoutConstraint</code>即自动布局的<strong>约束类</strong>，它是自动布局的关键之一。该类有如下属性我们需要重点关注。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NS_CLASS_AVAILABLE_IOS</span>(<span class="number">6</span>_0)</span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSLayoutConstraint</span> : <span class="title">NSObject</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// other code</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> <span class="built_in">UILayoutPriority</span> priority;</span><br><span class="line"><span class="keyword">@property</span> <span class="built_in">BOOL</span> shouldBeArchived;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* accessors</span></span><br><span class="line"><span class="comment"> firstItem.firstAttribute &#123;==,&lt;=,&gt;=&#125; secondItem.secondAttribute * multiplier + constant</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">assign</span>) <span class="keyword">id</span> firstItem;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSLayoutAttribute</span> firstAttribute;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSLayoutRelation</span> relation;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nullable</span>, <span class="keyword">readonly</span>, <span class="keyword">assign</span>) <span class="keyword">id</span> secondItem;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSLayoutAttribute</span> secondAttribute;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">CGFloat</span> multiplier;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Unlike the other properties, the constant may be modified after constraint creation.  Setting the constant on an existing constraint performs much better than removing the constraint and adding a new one that&#x27;s just like the old but for having a new constant.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="built_in">CGFloat</span> constant;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* The receiver may be activated or deactivated by manipulating this property.  Only active constraints affect the calculated layout.  Attempting to activate a constraint whose items have no common ancestor will cause an exception to be thrown.  Defaults to NO for newly created constraints. */</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">getter</span>=isActive) <span class="built_in">BOOL</span> active <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_10, <span class="number">8</span>_0);</span><br><span class="line"></span><br><span class="line"><span class="comment">// other code</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>布局公式：firstItem.firstAttribute {==,&lt;=,&gt;=} secondItem.secondAttribute * multiplier + constant</p>
+<p>解释：firstItem与secondItem分别是界面中受约束的视图与被参照的视图。</p>
+<p><strong>注意：当使用代码来修改约束时，只能修改约束的常量值constant。一旦创建了约束，其他只读属性都是无法修改的，特别要注意的是比例系数multiplier也是只读的。</strong></p>
+<p>Masonry是基于NSLayoutConstraint等类的封装，也正是如此，我们在调用<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *))block</code>的时候也只能更新<code>NSLayoutConstraint</code>中的<code>@property CGFloat constant</code>。</p>
+<p>在<code>MASViewConstraint</code>找到如下代码可以佐证：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)install &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// other code</span></span><br><span class="line">    </span><br><span class="line">    MASLayoutConstraint *existingConstraint = <span class="literal">nil</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.updateExisting) &#123; <span class="comment">//如果是update，则去匹配对应的existingConstraint</span></span><br><span class="line">        existingConstraint = [<span class="keyword">self</span> layoutConstraintSimilarTo:layoutConstraint];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (existingConstraint) &#123; <span class="comment">//找到了existingConstraint，最终也只更新了existingConstraint.constant</span></span><br><span class="line">        <span class="comment">// just update the constant</span></span><br><span class="line">        existingConstraint.constant = layoutConstraint.constant;</span><br><span class="line">        <span class="keyword">self</span>.layoutConstraint = existingConstraint;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//没有找到existingConstraint，添加一个新的约束</span></span><br><span class="line">        [<span class="keyword">self</span>.installedView addConstraint:layoutConstraint];</span><br><span class="line">        <span class="keyword">self</span>.layoutConstraint = layoutConstraint;</span><br><span class="line">        [firstLayoutItem.mas_installedConstraints addObject:<span class="keyword">self</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 除了constant，其它都一样的约束是Similar约束</span></span><br><span class="line">- (MASLayoutConstraint *)layoutConstraintSimilarTo:(MASLayoutConstraint *)layoutConstraint &#123;</span><br><span class="line">    <span class="comment">// check if any constraints are the same apart from the only mutable property constant</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// go through constraints in reverse as we do not want to match auto-resizing or interface builder constraints</span></span><br><span class="line">    <span class="comment">// and they are likely to be added first.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSLayoutConstraint</span> *existingConstraint <span class="keyword">in</span> <span class="keyword">self</span>.installedView.constraints.reverseObjectEnumerator) &#123;</span><br><span class="line">        <span class="keyword">if</span> (![existingConstraint isKindOfClass:MASLayoutConstraint.class]) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.firstItem != layoutConstraint.firstItem) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.secondItem != layoutConstraint.secondItem) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.firstAttribute != layoutConstraint.firstAttribute) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.secondAttribute != layoutConstraint.secondAttribute) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.relation != layoutConstraint.relation) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.multiplier != layoutConstraint.multiplier) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">if</span> (existingConstraint.priority != layoutConstraint.priority) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">id</span>)existingConstraint;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>样例：</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UILabel</span> *lbl;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UIButton</span> *btn;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="comment">// Do any additional setup after loading the view, typically from a nib.</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.btn = [<span class="built_in">UIButton</span> buttonWithType:<span class="built_in">UIButtonTypeCustom</span>];</span><br><span class="line">    <span class="keyword">self</span>.btn.backgroundColor = [<span class="built_in">UIColor</span> blueColor];</span><br><span class="line">    [<span class="keyword">self</span>.btn setTitle:<span class="string">@&quot;按钮&quot;</span> forState:<span class="built_in">UIControlStateNormal</span>];</span><br><span class="line">    [<span class="keyword">self</span>.btn addTarget:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(onTest:) forControlEvents:<span class="built_in">UIControlEventTouchDown</span>];</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:<span class="keyword">self</span>.btn];</span><br><span class="line">    [<span class="keyword">self</span>.btn mas_updateConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.top.equalTo(<span class="keyword">self</span>.view).offset(<span class="number">200</span>);</span><br><span class="line">        make.centerX.equalTo(<span class="keyword">self</span>.view);</span><br><span class="line">        make.size.mas_equalTo(<span class="built_in">CGSizeMake</span>(<span class="number">100</span>, <span class="number">33</span>));</span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.lbl = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    <span class="keyword">self</span>.lbl.text = <span class="string">@&quot;一个label&quot;</span>;</span><br><span class="line">    <span class="keyword">self</span>.lbl.backgroundColor = [<span class="built_in">UIColor</span> redColor];</span><br><span class="line">    <span class="keyword">self</span>.lbl.textAlignment = <span class="built_in">NSTextAlignmentCenter</span>;</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:<span class="keyword">self</span>.lbl];</span><br><span class="line">    [<span class="keyword">self</span>.lbl mas_updateConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.top.equalTo(<span class="keyword">self</span>.view).offset(<span class="number">300</span>);</span><br><span class="line">        make.centerX.equalTo(<span class="keyword">self</span>.view);</span><br><span class="line">        make.size.equalTo(<span class="keyword">self</span>.btn);</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)onTest:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.lbl mas_updateConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.size.mas_equalTo(<span class="built_in">CGSizeMake</span>(<span class="number">200</span>, <span class="number">100</span>));</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>当按钮被按下时，控制台出现如下警告</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">2016-08-03 18:49:13.110 layout[47924:2886276] Unable to simultaneously satisfy constraints.</span><br><span class="line">    Probably at least one of the constraints in the following list is one you don&#39;t want. </span><br><span class="line">    Try this: </span><br><span class="line">        (1) look at each constraint and try to figure out which you don&#39;t expect; </span><br><span class="line">        (2) find the code that added the unwanted constraint or constraints and fix it. </span><br><span class="line">(</span><br><span class="line">    &quot;&lt;MASLayoutConstraint:0x7ffecb632470 UIButton:0x7ffecb4f28e0.width &#x3D;&#x3D; 100&gt;&quot;,</span><br><span class="line">    &quot;&lt;MASLayoutConstraint:0x7ffecb637550 UILabel:0x7ffecb637030.width &#x3D;&#x3D; UIButton:0x7ffecb4f28e0.width&gt;&quot;,</span><br><span class="line">    &quot;&lt;MASLayoutConstraint:0x7ffecb71fc10 UILabel:0x7ffecb637030.width &#x3D;&#x3D; 200&gt;&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">Will attempt to recover by breaking constraint </span><br><span class="line">&lt;MASLayoutConstraint:0x7ffecb71fc10 UILabel:0x7ffecb637030.width &#x3D;&#x3D; 200&gt;</span><br><span class="line"></span><br><span class="line">Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.</span><br><span class="line">The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in &lt;UIKit&#x2F;UIView.h&gt; may also be helpful.</span><br><span class="line">2016-08-03 18:49:13.111 layout[47924:2886276] Unable to simultaneously satisfy constraints.</span><br><span class="line">    Probably at least one of the constraints in the following list is one you don&#39;t want. </span><br><span class="line">    Try this: </span><br><span class="line">        (1) look at each constraint and try to figure out which you don&#39;t expect; </span><br><span class="line">        (2) find the code that added the unwanted constraint or constraints and fix it. </span><br><span class="line">(</span><br><span class="line">    &quot;&lt;MASLayoutConstraint:0x7ffecb612bc0 UIButton:0x7ffecb4f28e0.height &#x3D;&#x3D; 33&gt;&quot;,</span><br><span class="line">    &quot;&lt;MASLayoutConstraint:0x7ffecb625300 UILabel:0x7ffecb637030.height &#x3D;&#x3D; UIButton:0x7ffecb4f28e0.height&gt;&quot;,</span><br><span class="line">    &quot;&lt;MASLayoutConstraint:0x7ffecb486f10 UILabel:0x7ffecb637030.height &#x3D;&#x3D; 100&gt;&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">Will attempt to recover by breaking constraint </span><br><span class="line">&lt;MASLayoutConstraint:0x7ffecb486f10 UILabel:0x7ffecb637030.height &#x3D;&#x3D; 100&gt;</span><br><span class="line"></span><br><span class="line">Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.</span><br><span class="line">The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in &lt;UIKit&#x2F;UIView.h&gt; may also be helpful.</span><br></pre></td></tr></table></figure>
+
+<p>原因是，lbl创建时其size约束是<code>make.size.equalTo(self.btn)</code>，但btn被点击时，企图去update size约束为<code>make.size.mas_equalTo(CGSizeMake(200, 100))</code>，然而无法找到existingConstraint，因此实际上是额外添加了一个约束<code>make.size.mas_equalTo(CGSizeMake(200, 100))</code>出现了布局冲突。</p>
+<p><strong>这件事可以这么看，NSLayoutConstraint只能修改constant决定了<code>mas_updateConstraints</code>的实现方式为：找到既有约束就去改变constant找不到既有约束就添加新约束。</strong></p>
+<h3 id="3-被Masonry布局的view一定要与比较view有共同的祖先view"><a href="#3-被Masonry布局的view一定要与比较view有共同的祖先view" class="headerlink" title="3 被Masonry布局的view一定要与比较view有共同的祖先view"></a>3 被Masonry布局的view一定要与比较view有共同的祖先view</h3><p>这句话比较拗口，其中涉及三类view，解释如下。</p>
+<ol>
+<li>被Masonry布局的view：执行了<code>- (NSArray *)mas_makeConstraints:(void(^)(MASConstraintMaker *make))block</code>、<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block </code>、<code>- (NSArray *)mas_remakeConstraints:(void(^)(MASConstraintMaker *make))block</code>等函数的view。</li>
+<li>比较view：以上3函数block块里面出现的view。</li>
+<li>共同的祖先view：【1】和【2】的共同祖先view。</li>
+</ol>
+<p><strong>样例1：</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)sampleCode</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UIView</span> *v0 = [<span class="built_in">UIView</span> new];</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:v0];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UIView</span> *v1 = [<span class="built_in">UIView</span> new];</span><br><span class="line">    [v0 addSubview:v1];</span><br><span class="line">    [v1 mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.size.mas_equalTo(<span class="built_in">CGSizeMake</span>(<span class="number">10</span>, <span class="number">10</span>));</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UIView</span> *v2 = [<span class="built_in">UIView</span> new];</span><br><span class="line">    [v0 addSubview:v2];</span><br><span class="line">    [v2 mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.size.equalTo(v1);</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>针对如下代码块来说</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIView</span> *v2 = [<span class="built_in">UIView</span> new];</span><br><span class="line">[v0 addSubview:v2];</span><br><span class="line">[v2 mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">    make.size.equalTo(v1);</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>v2是被Masonry布局的view，v1是比较view，v0是共同的祖先view。</p>
+<p><strong>样例2：</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AutoLayoutViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> useMasonryWithoutSuperView];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)useMasonryWithoutSuperView</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UIView</span> *masView = [<span class="built_in">UIView</span> new];</span><br><span class="line">    [masView mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.center.equalTo(<span class="keyword">self</span>.view);</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>以上代码执行时会crash，crash log如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2016-08-04 00:52:47.542 CommonTest[1731:22953] *** Assertion failure in -[MASViewConstraint install], &#x2F;Users&#x2F;shuncheng&#x2F;SourceCode&#x2F;SampleCode&#x2F;AutoLayout&#x2F;Pods&#x2F;Masonry&#x2F;Masonry&#x2F;MASViewConstraint.m:338</span><br><span class="line">2016-08-04 00:52:47.548 CommonTest[1731:22953] *** Terminating app due to uncaught exception &#39;NSInternalInconsistencyException&#39;, reason: &#39;couldn&#39;t find a common superview for &lt;UIView: 0x7fa59bd30dd0; frame &#x3D; (0 0; 0 0); layer &#x3D; &lt;CALayer: 0x7fa59bd2f3c0&gt;&gt; and &lt;UIView: 0x7fa59bd30c60; frame &#x3D; (0 0; 414 736); autoresize &#x3D; W+H; layer &#x3D; &lt;CALayer: 0x7fa59bd24780&gt;&gt;&#39;</span><br></pre></td></tr></table></figure>
+
+<p>crash的原因显而易见，即，masView(被Masonry布局的view)与self.view(比较view)没有共同祖先view，因为masView没有父view，所以它和self.view必然没有共同祖先view。</p>
+<p>被Masonry布局的view没有添加到superview上其实比较容易被发现，最怕的是出现如样例3一样的鬼畜情况。</p>
+<p><strong>样例3：</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AutoLayoutViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> sampleCode];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)sampleCode</span><br><span class="line">&#123;</span><br><span class="line">    AutoLayoutViewController * __<span class="keyword">weak</span> weakSelf = <span class="keyword">self</span>;</span><br><span class="line">    [fooNetworkModel fetchData:^&#123;</span><br><span class="line">        AutoLayoutViewController * <span class="keyword">self</span> = weakSelf;</span><br><span class="line">        [AutoLayoutViewController showSampleViewAtView:<span class="keyword">self</span>.view];</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+ (<span class="keyword">void</span>)showSampleViewAtView:(<span class="built_in">UIView</span> *)view</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UIView</span> *v1 = [<span class="built_in">UIView</span> new];</span><br><span class="line">    [view addSubview:v1];</span><br><span class="line">    [v1 mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.size.mas_equalTo(<span class="built_in">CGSizeMake</span>(<span class="number">10</span>, <span class="number">10</span>));</span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIView</span> *v2 = [<span class="built_in">UIView</span> new];</span><br><span class="line">    [view addSubview:v2];</span><br><span class="line">    [v2 mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.size.equalTo(v1);</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>以上代码通常不会出错，但是一种异常情况是：在AutoLayoutViewController析构后，网络数据返回，此时<code>AutoLayoutViewController * self = weakSelf</code>则<code>self == nil</code>。执行<code>[AutoLayoutViewController showSampleViewAtView:nil]</code>，则会出现【样例2】一样的crash。</p>
+<p>原因是：v1和v2都没有添加到view上去（因为view为空）所以<code>make.size.equalTo(v1)</code>会出错（v1和v2没有共同的父view）。由此也引申到weakSelf的副作用，即必须要确保weakSelf是nil时，执行逻辑完全没有问题（目前已经两次被坑）。</p>
+<h3 id="4-不要被update迷惑"><a href="#4-不要被update迷惑" class="headerlink" title="4 不要被update迷惑"></a>4 不要被update迷惑</h3><p>这里说的update有两层含义：</p>
+<ol>
+<li>UIView的方法<code>- (void)updateConstraints NS_AVAILABLE_IOS(6_0)</code></li>
+<li>Masonry的方法<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block</code></li>
+</ol>
+<p>这里先来讨论一下UIView的<code>- (void)updateConstraints</code>方法。</p>
+<p><code>- (void)updateConstraints</code>方法是用来更新view约束的，它有一个常见的使用场景——批量更新约束。比如你的多个约束是由多个不同的property决定，每次设置property都会直接更新局部约束。这样效率不高。不如直接override<code>- (void)updateConstraints</code>方法，在方面里面对property进行判断，每次设置property的时候调用一下<code>- (void)setNeedsUpdateConstraints</code>。伪代码如下：</p>
+<p>优化前：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AutoLayoutView</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setFactor1:(<span class="built_in">NSInteger</span>)factor1</span><br><span class="line">&#123;</span><br><span class="line">    _factor1 = factor1;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (_factor1满足条件) &#123;</span><br><span class="line">        更新约束<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setFactor2:(<span class="built_in">NSInteger</span>)factor2</span><br><span class="line">&#123;</span><br><span class="line">    _factor2 = factor2;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (_factor2满足条件) &#123;</span><br><span class="line">        更新约束<span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setFactor3:(<span class="built_in">NSInteger</span>)factor3</span><br><span class="line">&#123;</span><br><span class="line">    _factor3 = factor3;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (_factor3满足条件) &#123;</span><br><span class="line">        更新约束<span class="number">3</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>优化后：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AutoLayoutView</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setFactor1:(<span class="built_in">NSInteger</span>)factor1</span><br><span class="line">&#123;</span><br><span class="line">    _factor1 = factor1;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> setNeedsUpdateConstraints];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setFactor2:(<span class="built_in">NSInteger</span>)factor2</span><br><span class="line">&#123;</span><br><span class="line">    _factor2 = factor2;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> setNeedsUpdateConstraints];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setFactor3:(<span class="built_in">NSInteger</span>)factor3</span><br><span class="line">&#123;</span><br><span class="line">    _factor3 = factor3;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> setNeedsUpdateConstraints];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)updateConstraints</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.factor1满足) &#123;</span><br><span class="line">        更新约束<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.factor2满足) &#123;</span><br><span class="line">        更新约束<span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.factor3满足) &#123;</span><br><span class="line">        更新约束<span class="number">3</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">super</span> updateConstraints];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：一种有误区的写法是在<code>- (void)updateConstraints</code>方法中进行初次constraint设置，这是不被推荐的。推荐的写法是在<code>init</code>或者<code>viewDidLoad</code>中进行view的初次constraint设置。</p>
+<p>Masonry的方法<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block</code>我们在第二节已经讨论过了。刚接触自动布局和Masonry的同学很容易跟着感觉在<code>- (void)updateConstraints</code>函数里面调用Masonry的<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block</code>。实际上两者并没有必然联系。大多数情况在<code>- (void)updateConstraints</code>里面调用<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block</code>很有可能产生布局冲突。</p>
+<p><strong>样例</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 头文件</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSUInteger</span>, AutoLayoutType) &#123;</span><br><span class="line">    HorizontalLayout,</span><br><span class="line">    VerticalLayout,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">AutoLayoutView</span> : <span class="title">UIView</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UILabel</span> *name;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UILabel</span> *address;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) AutoLayoutType layoutType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现文件</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AutoLayoutView</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithFrame:(<span class="built_in">CGRect</span>)frame</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> initWithFrame:frame]) &#123;</span><br><span class="line">        _name = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">        [<span class="keyword">self</span> addSubview:_name];</span><br><span class="line">        </span><br><span class="line">        _address = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">        [<span class="keyword">self</span> addSubview:_address];</span><br><span class="line">        </span><br><span class="line">        [_name mas_updateConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">            make.left.top.equalTo(<span class="keyword">self</span>);</span><br><span class="line">        &#125;];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)updateConstraints</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.layoutType == HorizontalLayout) &#123;</span><br><span class="line">       <span class="comment">// // 此处误用mas_updateConstraints</span></span><br><span class="line">        [<span class="keyword">self</span>.address mas_updateConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">            make.top.equalTo(<span class="keyword">self</span>.name);</span><br><span class="line">            make.left.equalTo(<span class="keyword">self</span>.name.mas_right).offset(<span class="number">10</span>);</span><br><span class="line">        &#125;];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 此处误用mas_updateConstraints</span></span><br><span class="line">        [<span class="keyword">self</span>.address mas_updateConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">            make.left.equalTo(<span class="keyword">self</span>.name);</span><br><span class="line">            make.top.equalTo(<span class="keyword">self</span>.name.mas_bottom).offset(<span class="number">10</span>);</span><br><span class="line">        &#125;];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">super</span> updateConstraints];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setLayoutType:(AutoLayoutType)layoutType</span><br><span class="line">&#123;</span><br><span class="line">    _layoutType = layoutType;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> setNeedsUpdateConstraints];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 外部调用代码</span></span><br><span class="line">- (<span class="keyword">void</span>)sampleCode</span><br><span class="line">&#123;</span><br><span class="line">    AutoLayoutView *view = [[AutoLayoutView alloc] init];</span><br><span class="line">    view.name.text = <span class="string">@&quot;name&quot;</span>;</span><br><span class="line">    view.address.text = <span class="string">@&quot;address&quot;</span>;</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:view];</span><br><span class="line">    [view mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.center.equalTo(<span class="keyword">self</span>.view);</span><br><span class="line">        make.size.mas_equalTo(<span class="built_in">CGSizeMake</span>(<span class="number">200</span>, <span class="number">300</span>));</span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(<span class="number">2</span> * <span class="built_in">NSEC_PER_SEC</span>)), dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        view.layoutType = VerticalLayout; <span class="comment">//修改布局方式后，出现布局冲突</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-总结"><a href="#5-总结" class="headerlink" title="5 总结"></a>5 总结</h3><p>本文梳理了一下自动布局和Masonry使用的误区。在基本概念没搞清的情况下，很容易犯错。总结起来就如下4点：</p>
+<ol>
+<li>理解自身内容尺寸约束与抗压抗拉</li>
+<li>NSLayoutConstraint只能修改constant和<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block</code>实现细节之间的关系</li>
+<li>被Masonry布局的view一定要与比较view有共同的祖先view</li>
+<li>区分UIView的<code>- (void)updateConstraints</code>方法和<code>- (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block</code></li>
+</ol>
+<h3 id="6-参考资料"><a href="#6-参考资料" class="headerlink" title="6 参考资料"></a>6 参考资料</h3><p><a target="_blank" rel="noopener" href="https://developer.apple.com/videos/play/wwdc2015/219/?time=2176">WWDC-Mysteries of Auto Layout, Part 2</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/07/31/2016-07-31-NSMutableArray%E4%B8%AD%E5%88%A0%E9%99%A4%E5%AF%B9%E8%B1%A1%E7%9F%A5%E5%A4%9A%E5%B0%91/" rel="prev" title="NSMutableArray中删除对象知多少">
+      <i class="fa fa-chevron-left"></i> NSMutableArray中删除对象知多少
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/09/28/2016-09-28-%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAWebViewJavascriptBridge/" rel="next" title="深入浅出WebViewJavascriptBridge">
+      深入浅出WebViewJavascriptBridge <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%90%86%E8%A7%A3%E8%87%AA%E8%BA%AB%E5%86%85%E5%AE%B9%E5%B0%BA%E5%AF%B8%E7%BA%A6%E6%9D%9F%E4%B8%8E%E6%8A%97%E5%8E%8B%E6%8A%97%E6%8B%89"><span class="nav-number">1.</span> <span class="nav-text">1 理解自身内容尺寸约束与抗压抗拉</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NSLayoutConstraint%E5%8F%AA%E8%83%BD%E4%BF%AE%E6%94%B9constant"><span class="nav-number">2.</span> <span class="nav-text">2 NSLayoutConstraint只能修改constant</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%A2%ABMasonry%E5%B8%83%E5%B1%80%E7%9A%84view%E4%B8%80%E5%AE%9A%E8%A6%81%E4%B8%8E%E6%AF%94%E8%BE%83view%E6%9C%89%E5%85%B1%E5%90%8C%E7%9A%84%E7%A5%96%E5%85%88view"><span class="nav-number">3.</span> <span class="nav-text">3 被Masonry布局的view一定要与比较view有共同的祖先view</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%B8%8D%E8%A6%81%E8%A2%ABupdate%E8%BF%B7%E6%83%91"><span class="nav-number">4.</span> <span class="nav-text">4 不要被update迷惑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5 总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">6 参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

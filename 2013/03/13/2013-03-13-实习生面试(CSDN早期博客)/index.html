@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1.百度-数据分析部门公司:百度转正:实习生转正率70%~80%，9月份转正2013年3月5日14：00数据分析部门 一面：  笔写链表判环算法 10G数求前K个 给出以p概率生成0，1-p概率生成1的函数，设计以等概率生成0和1的函数。进一步设计随机数生成器。 想法，如何搜集用户信息  一面通过 二面：  一个log文件含有大小10G的query，求前K个出现次数最多的query 给出一个数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实习生面试(CSDN早期博客)">
+<meta property="og:url" content="http://yoursite.com/2013/03/13/2013-03-13-%E5%AE%9E%E4%B9%A0%E7%94%9F%E9%9D%A2%E8%AF%95(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="1.百度-数据分析部门公司:百度转正:实习生转正率70%~80%，9月份转正2013年3月5日14：00数据分析部门 一面：  笔写链表判环算法 10G数求前K个 给出以p概率生成0，1-p概率生成1的函数，设计以等概率生成0和1的函数。进一步设计随机数生成器。 想法，如何搜集用户信息  一面通过 二面：  一个log文件含有大小10G的query，求前K个出现次数最多的query 给出一个数据库">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2013-03-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-15T09:11:41.583Z">
+<meta property="article:author" content="宿于松下">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2013/03/13/2013-03-13-%E5%AE%9E%E4%B9%A0%E7%94%9F%E9%9D%A2%E8%AF%95(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>实习生面试(CSDN早期博客) | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">19</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/03/13/2013-03-13-%E5%AE%9E%E4%B9%A0%E7%94%9F%E9%9D%A2%E8%AF%95(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实习生面试(CSDN早期博客)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2013-03-13 00:00:00" itemprop="dateCreated datePublished" datetime="2013-03-13T00:00:00+08:00">2013-03-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 17:11:41" itemprop="dateModified" datetime="2021-08-15T17:11:41+08:00">2021-08-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="1-百度-数据分析部门"><a href="#1-百度-数据分析部门" class="headerlink" title="1.百度-数据分析部门"></a>1.百度-数据分析部门</h3><p>公司:百度<br>转正:实习生转正率70%~80%，9月份转正<br>2013年3月5日14：00<br>数据分析部门</p>
+<p>一面：</p>
+<ol>
+<li>笔写链表判环算法</li>
+<li>10G数求前K个</li>
+<li>给出以p概率生成0，1-p概率生成1的函数，设计以等概率生成0和1的函数。进一步设计随机数生成器。</li>
+<li>想法，如何搜集用户信息</li>
+</ol>
+<p>一面通过</p>
+<p>二面：</p>
+<ol>
+<li>一个log文件含有大小10G的query，求前K个出现次数最多的query</li>
+<li>给出一个数据库设计，分析不足之处</li>
+<li>随便写一个排序算法</li>
+<li>代码量多少</li>
+<li>想法，如何判断刘德华和郭富城的关系</li>
+</ol>
+<p>二面挂了</p>
+<p><strong>不足之处：笔写函数的熟练度，对常见排序算法的理解，数据库的常见知识点，索引之类。</strong></p>
+<h3 id="2-百度-基础平台部"><a href="#2-百度-基础平台部" class="headerlink" title="2.百度-基础平台部"></a>2.百度-基础平台部</h3><p>公司:百度<br>2013年03月11日 14：00<br>基础平台部的C/C++实习研发工程师 </p>
+<p>一面：</p>
+<p>面试官：研发工程师</p>
+<ol>
+<li>笔写c++实现一个栈</li>
+<li>IPC的几种方式</li>
+<li>笔写链表逆序</li>
+<li>智力题，100小球在管道对碰问题</li>
+</ol>
+<p>一面通过</p>
+<p>二面：</p>
+<p>面试官：资深研发工程师</p>
+<ol>
+<li>给1000万个北京电话号码排序，给出算法，分析时间复杂度</li>
+<li>二叉树遍历时间空间复杂度</li>
+<li>KMP算法</li>
+<li>c++实现不能被继承的类</li>
+<li>auto_ptr如何管理vector，auto_ptr的作用</li>
+<li>N个数前M大</li>
+<li>iostream和iostream.h的区别</li>
+<li>vector排序</li>
+<li>进程和线程区别</li>
+<li>笔写c++实现string类，实现big3，以及赋值操作符</li>
+</ol>
+<p>二面通过</p>
+<p>三面：</p>
+<p>面试官：经理</p>
+<p>首先给简历，没有固定题目，随便了解</p>
+<ol>
+<li>问对网络编程的了解，四层协议，分别解释一下</li>
+<li>问数据库范式的作用，分别解释</li>
+<li>数据库容量瓶颈在哪里，为什么不能把数据库设为无限大</li>
+<li>多线程的项目经历</li>
+<li>自身最大优点是什么，怎么证明</li>
+<li>为什么在简历中说善于发现bug，如果一个函数10次中有7次正确，3次错误，问题可能出现在哪里。你怎么解决问题，找到bug</li>
+<li>所用过的互联网产品，人人和微信各有什么特点</li>
+<li>职业规划如何，为什么不去研究所</li>
+</ol>
+<p>三面挂了</p>
+<p><strong>不足之处：STL底层，算法时间复杂度分析，数据库的常见知识点，操作系统进程线程，及其通信同步。</strong></p>
+<h3 id="3-SYMTEC"><a href="#3-SYMTEC" class="headerlink" title="3.SYMTEC"></a>3.SYMTEC</h3><p>公司：SYMTEC</p>
+<p>转正：完成实习任务即可转正，概率很高</p>
+<p>研发环境：linux，unix，shell，perl，jquery</p>
+<p>软件：Storge Foundation相关内部工具</p>
+<p>户口：每年有名额，由FESCO管理</p>
+<p>2013.03.<strong>.</strong>.**<br>电话面试<br>面试官：**技术人员</p>
+<ol>
+<li>数组逆序</li>
+<li>字符拷贝</li>
+<li>SQL查找取前100个</li>
+<li>英语自我介绍，</li>
+<li>英文对话</li>
+</ol>
+<p>2013.03.15.16.30<br>面试<br>面试官：技术员1，技术员2，hr。三人同时</p>
+<p>技术员1：</p>
+<ol>
+<li>基类析构函数设置为virtual的作用，在实际工程项目中是否遇到过memory leak</li>
+<li>C++多继承出现钻石环，孙子类调用祖父类的函数会有什么情况</li>
+<li>介绍STL，vector的底层实现，sizeof（vector<int>）是多少，map底层实现</li>
+<li>MFC中所有窗口都继承的类，MFC中所有类都是从什么类派生的（注：面试官出的题目有错误，有些类不是从CObject继承的，比如CPoint）</li>
+<li>CString和string的相互转化</li>
+<li>引用和指针的区别，是否可以有const引用</li>
+<li>C语言中的malloc和C++中new的区别</li>
+</ol>
+<p>技术员2：</p>
+<ol>
+<li>SQL查找取前100个</li>
+<li>黑板上手写一个二分查找（注：写下了严书中的算法，技术员1指出了严书上二分查找的不足之处）</li>
+<li>能不能耐住寂寞，面对50%的重复性劳动会怎样</li>
+<li>英语问答环节</li>
+<li>Self Introduction</li>
+<li>Why don`t you go abroad</li>
+<li>Short term and long term goals</li>
+<li>Why do you choose automation as you major</li>
+<li>Are you a popular person，how can you prove it</li>
+<li>I think you are too confident , how do you think so</li>
+<li>Who is always disappointed on you？<br>Hr：<br>一直在观察面试者，基本上没问问题<br>不足之处：STL底层，数据库查询语句。</li>
+</ol>
+<h3 id="4-酷我音乐"><a href="#4-酷我音乐" class="headerlink" title="4.酷我音乐"></a>4.酷我音乐</h3><p>公司：KUWO<br>转正：概率很高</p>
+<p>2013.03.19</p>
+<p>一面：</p>
+<ol>
+<li>多线程同步</li>
+<li>快速排序时间复杂度，最好时间复杂度，以排序的数组，再进行快速排序，时间复杂度是多少</li>
+<li>设计模式，写个单例模式，说说了解的设计模式</li>
+<li>为什么控制跑来做软件开发</li>
+</ol>
+<p>二面：</p>
+<ol>
+<li>虚函数的作用，静态成员函数的作用</li>
+<li>类对象的内存布局</li>
+<li>在dll里面干掉一个线程会出现什么情况</li>
+</ol>
+<p>三面：</p>
+<ol>
+<li>如何快速从文件中读取数据，比如数据记录是姓名，年龄，性别，数据记录是顺序排列。查询的输入是第x条记录。（只回答对了建立文件映射，关键是不理解题目）</li>
+<li>如何设计一个通用的单例模式</li>
+<li>简历中为什么说善于发现bug，最近一次发现bug是什么时候，怎么解决的。有没有发现运行时期的bug</li>
+</ol>
+<p>四面：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;  *（&amp;a+<span class="number">1</span>）和*(&amp;a[<span class="number">0</span>] + <span class="number">1</span>)分别是多少</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Test</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> a;</span><br><span class="line"><span class="keyword">int</span> m;</span><br><span class="line">&#125;</span><br><span class="line">Test test;</span><br><span class="line">&amp;test的值和 &amp;(test.m) 和 &amp;（test.a）的值的关系</span><br><span class="line">解释一下堆栈 和 堆的特点</span><br><span class="line">解释一下<span class="keyword">static_cast</span>和<span class="keyword">dynamic_cast</span>的区别</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; a；如何获得a内部数组地址</span><br><span class="line">主线程等到子线程干完才能干事，主线程怎么知道子线程干完了？不能用内核同步方式。</span><br><span class="line">多维数组存储模型</span><br></pre></td></tr></table></figure>
+
+<p>五面：<br>一个服务号码比如123456 对应的是下载音乐服务。有很多服务号码，分别对应不同的服务。这些号码不会超过13位。设计一个数据结构根据输入的码找到相应服务。<br>开始回答用map，查找的复杂度是O(nlogn）；<br>后来说如果输入的服务码多了会怎样，怎么容错？比如一个服务码是22221对应听故事服务，用户输入了222211111，如何任然定位到听故事服务。内存不限。<br>想到了基数排序，最后设计了一个算法，面试官说我设计的叫做字典树，我表示瞎猫碰死耗子</p>
+<p>六面：<br>基本聊天，没问技术问题。</p>
+<p>七面：<br>HR<br>不足之处：算法的分析，数据结构的了解。</p>
+<h3 id="5-搜狗"><a href="#5-搜狗" class="headerlink" title="5.搜狗"></a>5.搜狗</h3><p>职位：Windows客户端浏览器开发</p>
+<p>时间：2013.03.27</p>
+<p>一面：</p>
+<ol>
+<li>虚析构函数的作用</li>
+<li><code>void memcpy (void* dest, const void* src, size_t len)；</code>实现函数；有什么需要注意的？</li>
+<li><code>list&lt;int&gt; iList；</code>删除所用等于某个特定值的元素</li>
+<li>多进程通信用过哪些？</li>
+<li>多线程同步方式？用过哪些？</li>
+<li>WTL和COM的了解</li>
+<li>是否用过模版？解释模版特化和偏特化</li>
+<li>dll中new的对象在exe中删除是否合适？</li>
+<li>exeA和exeB都载入dllC，问dllC是否在A和B中各有一份？</li>
+<li>你是如何在不同工程中实现同种子功能的？</li>
+<li>DC，客户区和非客户区，贴图图形闪烁的原因</li>
+<li>1000万个人的身高，找出前20</li>
+<li>txtA和txtB每行都是文本，求A和B内容相同的行 </li>
+</ol>
+<p><strong>不足之处：Win32中dll的了解。</strong></p>
+<p>时间：2013.04.03</p>
+<p>二面：</p>
+<ol>
+<li>如何获得当前exe运行的目录</li>
+<li>vetor容器不停push_back导致容器的capacity增长，描述一下capacity增长的过程</li>
+<li>双线程（一个读线程、一个写线程）同时对一块内存操作，比如int g_iNum;是否需要加锁？如果把整数换成list呢？</li>
+<li>SendMessage 和 PostMessage的区别，如果窗口A和窗口B相互SendMessage会出现什么情况？</li>
+<li>多线程同步,列举你用过的方式。Event 和 Mutex有什么区别？</li>
+<li>自动重置的Event和获得Event后立即手动重置有什么区别？</li>
+<li>dll载入后，怎么调用函数?</li>
+<li>最近看了什么书？</li>
+<li>为什么看了那么多书？不去实践一下？</li>
+<li>如果老板交给你一个活，你怎么处理？</li>
+<li>有没有女朋友？工作还是上学？如果她不能在北京找到工作怎么办？</li>
+<li>找工作中是否户口很重要？如果一个国企有户口，和一个你喜欢干的工作没有户口，怎么选择？</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">     <span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;Hello World&quot;</span>&lt;&lt;<span class="built_in">endl</span>;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">   A* p = <span class="literal">NULL</span>;</span><br><span class="line">   p-&gt;func();<span class="comment">//会出问题吗？</span></span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">     <span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123; <span class="built_in">cout</span>&lt;&lt;m_iTest&lt;&lt;<span class="built_in">endl</span>;<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;Hello World&quot;</span>&lt;&lt;<span class="built_in">endl</span>;&#125;</span><br><span class="line">     <span class="keyword">int</span>    m_iTest;</span><br><span class="line">&#125;;</span><br><span class="line">这样呢？调用p-&gt;func()会出问题吗？</span><br><span class="line"></span><br><span class="line">如果把 func函数设置为<span class="keyword">virtual</span>呢？ 问题出在哪一步？</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">A tmpA，tmpB；</span><br><span class="line">tmpA.func();</span><br><span class="line">tmpB.func();</span><br><span class="line">编译器怎知道是tmpA还是tmpB调用func呢？</span><br><span class="line"></span><br><span class="line">类的成员函数可以作为线程函数吗？</span><br><span class="line"></span><br><span class="line">为什么<span class="keyword">static</span>成员函数可以作为线程函数？</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span>成员函数和普通的成员函数的区别在哪里？针对这个问题。。。</span><br></pre></td></tr></table></figure>
+
+<p>不足之处：Win32中dll的了解。 </p>
+<h3 id="6-豌豆荚"><a href="#6-豌豆荚" class="headerlink" title="6.豌豆荚"></a>6.豌豆荚</h3><p>一面：</p>
+<p>实现大整数乘法</p>
+<p>二面:</p>
+<p>实现字符串匹配算法</p>
+<h3 id="7-腾讯"><a href="#7-腾讯" class="headerlink" title="7.腾讯"></a>7.腾讯</h3><p>职位：Windows客户端浏览器开发</p>
+<p>时间：2013.04.24</p>
+<p>一面：</p>
+<ol>
+<li>MFC怎么实现消息映射</li>
+<li>Windows程序的基本流程，创建的窗口怎么跟窗口过程绑定起来</li>
+<li>C++看过什么书</li>
+<li>说一下《Effective C++》中印象最深的一个条款</li>
+<li>编译器为类默认实现的函数有哪些</li>
+<li>C++怎么实现虚函数机制</li>
+<li>A、B、C三个类，A是C的基类，同时C中包含有B的对象，A、B、C构造函数执行顺序</li>
+<li>Vptr在哪里初始化的</li>
+<li>Windows中多线程同步机制</li>
+<li>Windows中有没有共享内存？ 文件映射的作用</li>
+<li>用两个队列模拟一个堆栈</li>
+<li>设计一个不能被继承的类</li>
+<li>Heap和Stack的区别</li>
+</ol>
+<p>二面：</p>
+<ol>
+<li>C++看过什么书</li>
+<li>Windows看过什么书</li>
+<li>说一下Windows内存模型</li>
+<li>Windows哪块比较熟悉？IO、内存管理、多线程？</li>
+<li>怎么把单线程函数拆为多线程函数？比如用单线程对一张位图进行灰度化。怎么把这种单线程任务拆分为多线程</li>
+<li>1G内存，两个exe。说一下内存占用情况</li>
+</ol>
+<p>三面：<br>HR </p>
+<h3 id="8-阿里巴巴"><a href="#8-阿里巴巴" class="headerlink" title="8.阿里巴巴"></a>8.阿里巴巴</h3><p>时间：2013.05.21</p>
+<p>一面：</p>
+<ol>
+<li>解释重载和多态</li>
+<li>堆和栈的区别？应用场景分别是什么？</li>
+<li>用过的类库？vector和list的区别。是否多线程安全的？</li>
+<li>设计模式了解哪些？写一个单例模式</li>
+<li>适配器模式是否了解？</li>
+<li>是否做过多进程通讯？跨机器的进程通讯的方式有哪些？</li>
+<li>说一下OSI七层模型</li>
+<li>网络拥塞发生在哪一层？</li>
+<li>tcp和udp区别</li>
+<li>数据库了解多少？</li>
+<li>有没有看过常用算法的工业级源码实现？如快速排序等</li>
+<li>聊项目，做的东西</li>
+<li>引申我做的项目，同一反射内存地址 怎么在多机器环境下保持读写不冲突？ </li>
+</ol>
+<p>二面：（后记）</p>
+<ol>
+<li>感觉写过最好的代码</li>
+<li>一道算法题</li>
+<li>聊了一下dota喜欢什么英雄</li>
+</ol>
+<p>三面：<br>HR</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2014/01/06/2014-01-06-%20%E4%BB%8EC++%E5%88%B0Objective-C%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/" rel="next" title="从C++到Objective-C的学习笔记(CSDN早期博客)">
+      从C++到Objective-C的学习笔记(CSDN早期博客) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%99%BE%E5%BA%A6-%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E9%83%A8%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">1.百度-数据分析部门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%99%BE%E5%BA%A6-%E5%9F%BA%E7%A1%80%E5%B9%B3%E5%8F%B0%E9%83%A8"><span class="nav-number">2.</span> <span class="nav-text">2.百度-基础平台部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-SYMTEC"><span class="nav-number">3.</span> <span class="nav-text">3.SYMTEC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E9%85%B7%E6%88%91%E9%9F%B3%E4%B9%90"><span class="nav-number">4.</span> <span class="nav-text">4.酷我音乐</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%90%9C%E7%8B%97"><span class="nav-number">5.</span> <span class="nav-text">5.搜狗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E8%B1%8C%E8%B1%86%E8%8D%9A"><span class="nav-number">6.</span> <span class="nav-text">6.豌豆荚</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E8%85%BE%E8%AE%AF"><span class="nav-number">7.</span> <span class="nav-text">7.腾讯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4"><span class="nav-number">8.</span> <span class="nav-text">8.阿里巴巴</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

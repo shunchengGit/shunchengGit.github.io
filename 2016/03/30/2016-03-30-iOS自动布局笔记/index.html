@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1 autoresizing1autoresizingMask：创建视图的同时给出其相对于父视图的“对齐方式与缩放系数”。当父视图发生变化时，通过每个子视图的autoresizingMask即可自动得出新的位置，而无需开发者提供。  缺点：  其描述界面变化规则不够灵活，很多变化规则根本无法精确描述。autoresizingMask缩放比例是UIKit内部计算的，开发者无法指定缩放比例的精确值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS自动布局笔记">
+<meta property="og:url" content="http://yoursite.com/2016/03/30/2016-03-30-iOS%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="1 autoresizing1autoresizingMask：创建视图的同时给出其相对于父视图的“对齐方式与缩放系数”。当父视图发生变化时，通过每个子视图的autoresizingMask即可自动得出新的位置，而无需开发者提供。  缺点：  其描述界面变化规则不够灵活，很多变化规则根本无法精确描述。autoresizingMask缩放比例是UIKit内部计算的，开发者无法指定缩放比例的精确值。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-03-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-15T09:11:41.585Z">
+<meta property="article:author" content="宿于松下">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2016/03/30/2016-03-30-iOS%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>iOS自动布局笔记 | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">19</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/30/2016-03-30-iOS%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS自动布局笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-30 00:00:00" itemprop="dateCreated datePublished" datetime="2016-03-30T00:00:00+08:00">2016-03-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 17:11:41" itemprop="dateModified" datetime="2021-08-15T17:11:41+08:00">2021-08-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-autoresizing"><a href="#1-autoresizing" class="headerlink" title="1 autoresizing"></a>1 autoresizing</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">autoresizingMask：创建视图的同时给出其相对于父视图的“对齐方式与缩放系数”。当父视图发生变化时，通过每个子视图的autoresizingMask即可自动得出新的位置，而无需开发者提供。</span><br></pre></td></tr></table></figure>
+
+<p>缺点：</p>
+<ul>
+<li><p>其描述界面变化规则不够灵活，很多变化规则根本无法精确描述。autoresizingMask<strong>缩放比例</strong>是UIKit内部计算的，开发者无法指定缩放比例的精确值。</p>
+</li>
+<li><p>变化规则只能基于<strong>父视图与子视图</strong>之间，无法建立同级视图或者跨级视图之间的关系。</p>
+</li>
+</ul>
+<p>样例：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UIView</span> *containerView = [[<span class="built_in">UIView</span> alloc] initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">320</span>, <span class="number">200</span>)];</span><br><span class="line">    containerView.backgroundColor = [<span class="built_in">UIColor</span> blueColor];</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:containerView];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UILabel</span> *text = [[<span class="built_in">UILabel</span> alloc] initWithFrame:<span class="built_in">CGRectZero</span>];</span><br><span class="line">    text.text = <span class="string">@&quot;1231312&quot;</span>;</span><br><span class="line">    [containerView addSubview:text];</span><br><span class="line">    text.autoresizingMask = <span class="built_in">UIViewAutoresizingFlexibleLeftMargin</span> | <span class="built_in">UIViewAutoresizingFlexibleWidth</span>;</span><br><span class="line">    text.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, containerView.bounds.size.width - <span class="number">20</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(<span class="number">2</span> * <span class="built_in">NSEC_PER_SEC</span>)), dispatch_get_main_queue(), ^&#123;</span><br><span class="line">      containerView.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">300</span>, <span class="number">200</span>);</span><br><span class="line">      <span class="built_in">NSLog</span>(<span class="string">@&quot;%@ %@ %@ %@&quot;</span>, @(text.frame.origin.x), @(text.frame.origin.y), @(text.frame.size.width),</span><br><span class="line">            @(text.frame.size.height));</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-autolayout"><a href="#2-autolayout" class="headerlink" title="2 autolayout"></a>2 autolayout</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">autolayout:它允许开发者在界面上的任意两个视图之间建立精确的线性变化规则。所谓线性变化就是数学中的一次函数，即：y &#x3D; m*x + c,其中x和y是界面中任意两个视图的某个布局属性，m为比例系数，c为常量。每个线性变化规则称之为布局约束（Layout Constraint）。</span><br><span class="line">&#96;&#96;&#96;    </span><br><span class="line"></span><br><span class="line">### 2.1 NSLayoutConstraint</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;objc</span><br><span class="line">NS_CLASS_AVAILABLE_IOS(6_0)</span><br><span class="line">@interface NSLayoutConstraint : NSObject</span><br><span class="line">...</span><br><span class="line">@property (readonly, assign) id firstItem;</span><br><span class="line">@property (readonly) NSLayoutAttribute firstAttribute;</span><br><span class="line">@property (readonly) NSLayoutRelation relation;</span><br><span class="line">@property (readonly, assign) id secondItem;</span><br><span class="line">@property (readonly) NSLayoutAttribute secondAttribute;</span><br><span class="line">@property (readonly) CGFloat multiplier;</span><br><span class="line">@property CGFloat constant;</span><br><span class="line">...</span><br><span class="line">+(instancetype)constraintWithItem:(id)firstItem attribute:(NSLayoutAttribute)firstAttribute </span><br><span class="line"> relatedBy:(NSLayoutRelation)relation </span><br><span class="line"> toItem:(id)secondItem attribute:(NSLayoutAttribute)secondAttribute </span><br><span class="line"> multiplier:(CGFloat)multiplier constant:(CGFloat)constant;</span><br></pre></td></tr></table></figure>
+
+<p>公式：*<em>firstItem.firstAttribute {==,&lt;=,&gt;=} secondItem.secondAttribute * multiplier + constant*</em></p>
+<p>解释：firstItem与secondItem分别是界面中受约束的视图与被参照的视图。他们不一定非得是兄弟关系或者父子关系，只要是他们 <strong>有着共同的祖先视图</strong> 即可，这一点是autoresizingMask无法做到的。<br>firstAttribute与secondAttribute分别是firstItem与secondItem的某个布局属性（NSLayoutAttribute）。注意，firstItem与secondItem不一定非得是同样的值， <strong>允许定义诸如某视图的高度等于另一个视图的宽度这样的约束</strong>。NSLayoutAttributeNotAnAttribute这个额外解释一下，当我们需要为某个视图精确指定一个宽度或者高度值时，这时候secondItem为nil，secondAttribute为NSLayoutAttributeNotAnAttribute。relation定义了布局关系（NSLayoutRelation）。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="comment">// Do any additional setup after loading the view, typically from a nib.</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIView</span> *v1 = [<span class="built_in">UIView</span> new];</span><br><span class="line">    v1.backgroundColor = [<span class="built_in">UIColor</span> blueColor];</span><br><span class="line">    v1.translatesAutoresizingMaskIntoConstraints = <span class="literal">NO</span>;</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:v1];</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *topConstraint = [<span class="built_in">NSLayoutConstraint</span> constraintWithItem:v1</span><br><span class="line">                                                                     attribute:<span class="built_in">NSLayoutAttributeTop</span></span><br><span class="line">                                                                     relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                                                        toItem:<span class="keyword">self</span>.view</span><br><span class="line">                                                                     attribute:<span class="built_in">NSLayoutAttributeTop</span></span><br><span class="line">                                                                    multiplier:<span class="number">1</span></span><br><span class="line">                                                                      constant:<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *leftConstraint = [<span class="built_in">NSLayoutConstraint</span> constraintWithItem:v1</span><br><span class="line">                                                                      attribute:<span class="built_in">NSLayoutAttributeLeft</span></span><br><span class="line">                                                                      relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                                                         toItem:<span class="keyword">self</span>.view</span><br><span class="line">                                                                      attribute:<span class="built_in">NSLayoutAttributeLeft</span></span><br><span class="line">                                                                     multiplier:<span class="number">1</span></span><br><span class="line">                                                                       constant:<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *rightConstraint = [<span class="built_in">NSLayoutConstraint</span> constraintWithItem:v1</span><br><span class="line">                                                                       attribute:<span class="built_in">NSLayoutAttributeRight</span></span><br><span class="line">                                                                       relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                                                          toItem:<span class="keyword">self</span>.view</span><br><span class="line">                                                                       attribute:<span class="built_in">NSLayoutAttributeRight</span></span><br><span class="line">                                                                      multiplier:<span class="number">1</span></span><br><span class="line">                                                                        constant:<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *heightConstraint = [<span class="built_in">NSLayoutConstraint</span> constraintWithItem:v1</span><br><span class="line">                                                                        attribute:<span class="built_in">NSLayoutAttributeHeight</span></span><br><span class="line">                                                                        relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                                                           toItem:<span class="keyword">self</span>.view</span><br><span class="line">                                                                        attribute:<span class="built_in">NSLayoutAttributeHeight</span></span><br><span class="line">                                                                       multiplier:<span class="number">0.5</span></span><br><span class="line">                                                                         constant:<span class="number">0</span>];</span><br><span class="line">    <span class="comment">// iOS8 以下</span></span><br><span class="line"><span class="comment">//    [v1 addConstraint:topConstraint];</span></span><br><span class="line"><span class="comment">//    [v1 addConstraint:leftConstraint];</span></span><br><span class="line"><span class="comment">//    [v1 addConstraint:rightConstraint];</span></span><br><span class="line"><span class="comment">//    [v1 addConstraint:heightConstraint];</span></span><br><span class="line">    <span class="comment">// iOS8及以上</span></span><br><span class="line">    topConstraint.active = <span class="literal">YES</span>;</span><br><span class="line">    leftConstraint.active = <span class="literal">YES</span>;</span><br><span class="line">    rightConstraint.active = <span class="literal">YES</span>;</span><br><span class="line">    heightConstraint.active = <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-VFL"><a href="#2-2-VFL" class="headerlink" title="2.2 VFL"></a>2.2 VFL</h3><p>iOS自动布局形式化描述语言。</p>
+<h3 id="2-3-自身内容尺寸约束、修改约束、布局动画"><a href="#2-3-自身内容尺寸约束、修改约束、布局动画" class="headerlink" title="2.3 自身内容尺寸约束、修改约束、布局动画"></a>2.3 自身内容尺寸约束、修改约束、布局动画</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">自身内容尺寸约束:一般来说，要确定一个视图的精确位置，至少需要4个布局约束（以确定水平位置x、垂直位置y、宽度w和高度h）。但是，某些用来展现内容的用户控件，例如文本控件UILabel、按钮UIButton、图片视图UIImageView等，它们具有自身内容尺寸（Intrinsic Content Size），此类用户控件会根据自身内容尺寸添加布局约束。也就是说，如果开发者没有显式给出其宽度或者高度约束，则其自动添加的自身内容约束将会起作用。因此看似“缺失”约束，实际上并非如此。</span><br></pre></td></tr></table></figure>
+
+<p>对于约束的如下几个重要属性：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">assign</span>) <span class="keyword">id</span> firstItem;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSLayoutAttribute</span> firstAttribute;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSLayoutRelation</span> relation;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">assign</span>) <span class="keyword">id</span> secondItem;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">NSLayoutAttribute</span> secondAttribute;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>) <span class="built_in">CGFloat</span> multiplier;</span><br><span class="line">    </span><br><span class="line"><span class="comment">/* Unlike the other properties, the constant may be modified after constraint creation.  Setting the constant on an existing constraint performs much better than removing the constraint and adding a new one that&#x27;s just like the old but for having a new constant.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="built_in">CGFloat</span> constant;</span><br></pre></td></tr></table></figure>
+
+<p><strong>更新约束</strong>：</p>
+<p>当使用代码来修改约束时，只能修改约束的常量值constant。一旦创建了约束，其他只读属性都是无法修改的，特别要注意的是比例系数multiplier也是只读的。</p>
+<p><strong>添加删除约束</strong>：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)keyboardWillShow:(<span class="built_in">NSNotification</span> *)notification</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYNormalCons.active = <span class="literal">NO</span>;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYKeyboardCons.active = <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)keyboardWillHide:(<span class="built_in">NSNotification</span> *)notification</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYKeyboardCons.active = <span class="literal">NO</span>;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYNormalCons.active = <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>尽量先设置需要将active置为NO的约束，然后再设置需要将active置为YES的约束，如果颠倒上面两条语句的话，可能会引起运行时约束错误。</p>
+<p><strong>修改约束优先级</strong>：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)keyboardWillShow:(<span class="built_in">NSNotification</span> *)notification</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYNormalCons.priority = <span class="built_in">UILayoutPriorityDefaultLow</span>;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYKeyboardCons.priority = <span class="built_in">UILayoutPriorityDefaultHigh</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)keyboardWillHide:(<span class="built_in">NSNotification</span> *)notification</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYKeyboardCons.priority = <span class="built_in">UILayoutPriorityDefaultLow</span>;</span><br><span class="line">    <span class="keyword">self</span>.labelCenterYNormalCons.priority = <span class="built_in">UILayoutPriorityDefaultHigh</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，只能修改可选约束的优先级，也就是说：</p>
+<p><strong>- 不允许将优先级由小于1000的值改为1000</strong><br><strong>- 不允许将优先级由1000修改为小于1000的值</strong></p>
+<p>例如，如果将优先级由250修改为1000，则会抛出异常。</p>
+<p><strong>自身内容尺寸约束的抗挤压与抗拉抻效果</strong></p>
+<p>弹簧会有自身固有长度，当有外力作用时，弹簧会抵抗外力作用，尽量接近固有长度。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">抗拉抻：当外力拉长弹簧时，弹簧长度大于固有长度，且产生向内收的力阻止外力拉抻，且尽量维持长度接近自身固有长度。 </span><br><span class="line">抗挤压：当外力挤压弹簧时，弹簧长度小于固有长度，且产生向外顶的力阻止外力挤压，且尽量维持长度接近自身固有长度。</span><br></pre></td></tr></table></figure>
+
+<p>对于自身内容尺寸约束，Hug值表示抗拉抻优先级，CompressionResistance值表示抗压缩优先级。Hug值越高越难被拉抻，CompressionResistance值越高越难被压缩。<strong>这两个都是针对自身内容尺寸</strong>。这两个值越高，在自动布局的时候，view的真实布局就越接近自身内容尺寸。他们表达的是一种自身内容尺寸约束对外加约束的抵抗力。</p>
+<h2 id="参考文档："><a href="#参考文档：" class="headerlink" title="参考文档："></a>参考文档：</h2><ol>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/pucker/article/details/41832939">iOS 8 Auto Layout界面自动布局系列1-自动布局的基本原理</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/pucker/article/details/41843511">iOS 8 Auto Layout界面自动布局系列2-使用Xcode的Interface Builder添加布局约束</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/pucker/article/details/45070955">iOS 8 Auto Layout界面自动布局系列3-使用代码添加布局约束</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/pucker/article/details/45093483">iOS 8 Auto Layout界面自动布局系列4-使用VFL添加布局约束</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/pucker/article/details/45149759">iOS 8 Auto Layout界面自动布局系列5-自身内容尺寸约束、修改约束、布局动画</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/11/22/2015-11-22-%E4%BB%8ENSString%E5%AF%B9%E8%B1%A1copy%E5%92%8CmutableCopy%E8%B0%88%E8%B5%B7/" rel="prev" title="从copy和mutableCopy谈起">
+      <i class="fa fa-chevron-left"></i> 从copy和mutableCopy谈起
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/07/20/2016-07-20-Objective-C%E5%BC%80%E5%8F%91%E5%B0%8FTip/" rel="next" title="Objective-C开发小Tip">
+      Objective-C开发小Tip <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-autoresizing"><span class="nav-number">1.</span> <span class="nav-text">1 autoresizing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-autolayout"><span class="nav-number">2.</span> <span class="nav-text">2 autolayout</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-VFL"><span class="nav-number">2.1.</span> <span class="nav-text">2.2 VFL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%87%AA%E8%BA%AB%E5%86%85%E5%AE%B9%E5%B0%BA%E5%AF%B8%E7%BA%A6%E6%9D%9F%E3%80%81%E4%BF%AE%E6%94%B9%E7%BA%A6%E6%9D%9F%E3%80%81%E5%B8%83%E5%B1%80%E5%8A%A8%E7%94%BB"><span class="nav-number">2.2.</span> <span class="nav-text">2.3 自身内容尺寸约束、修改约束、布局动画</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">参考文档：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

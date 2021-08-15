@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1引言你点击了桌面上的Chrome图标，一个浏览器窗口出现了，输入网址就可以在Internet世界愉快玩耍。这一切是怎么实现的呢？Chromium这个多进程的程序是如何启动各个进程的呢？浏览器主进程（界面进程）启动了哪些线程？如何启动的呢？这些问题一直萦绕在心头，一起来看看源代码吧。本文主要针对Chromium for Mac的源代码，其它操作系统大同小异。 2背景知识浏览器作为一个应用程序，是以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Chromium的启动流程(CSDN早期博客)">
+<meta property="og:url" content="http://yoursite.com/2014/05/19/2014-05-19-Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="1引言你点击了桌面上的Chrome图标，一个浏览器窗口出现了，输入网址就可以在Internet世界愉快玩耍。这一切是怎么实现的呢？Chromium这个多进程的程序是如何启动各个进程的呢？浏览器主进程（界面进程）启动了哪些线程？如何启动的呢？这些问题一直萦绕在心头，一起来看看源代码吧。本文主要针对Chromium for Mac的源代码，其它操作系统大同小异。 2背景知识浏览器作为一个应用程序，是以">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/1.png">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/2.png">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/3.png">
+<meta property="og:image" content="http://yoursite.com/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/4.bmp">
+<meta property="article:published_time" content="2014-05-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-15T09:11:41.584Z">
+<meta property="article:author" content="宿于松下">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/1.png">
+
+<link rel="canonical" href="http://yoursite.com/2014/05/19/2014-05-19-Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Chromium的启动流程(CSDN早期博客) | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">19</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/05/19/2014-05-19-Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Chromium的启动流程(CSDN早期博客)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2014-05-19 00:00:00" itemprop="dateCreated datePublished" datetime="2014-05-19T00:00:00+08:00">2014-05-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 17:11:41" itemprop="dateModified" datetime="2021-08-15T17:11:41+08:00">2021-08-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="1引言"><a href="#1引言" class="headerlink" title="1引言"></a>1引言</h3><p>你点击了桌面上的Chrome图标，一个浏览器窗口出现了，输入网址就可以在Internet世界愉快玩耍。这一切是怎么实现的呢？Chromium这个多进程的程序是如何启动各个进程的呢？浏览器主进程（界面进程）启动了哪些线程？如何启动的呢？这些问题一直萦绕在心头，一起来看看源代码吧。本文主要针对Chromium for Mac的源代码，其它操作系统大同小异。</p>
+<h3 id="2背景知识"><a href="#2背景知识" class="headerlink" title="2背景知识"></a>2背景知识</h3><p>浏览器作为一个应用程序，是以进程的形式运行在操作系统上的。首先，Chromium是一个多进程的应用程序，我们需要了解Chromium的多进程框架。其次，Chromium中的每个进程又是多线程的，因而又需要了解Chromium的线程设计。接下来我们就从进程和线程入手介绍相关背景知识。</p>
+<h4 id="2-1多进程框架"><a href="#2-1多进程框架" class="headerlink" title="2.1多进程框架"></a>2.1多进程框架</h4><p>Chromium是个多进程程序，每当你点开Chromium图标，默认会启动多个进程。Google之所以这样设计，是怕你打开某个挫B网站而把它的整个浏览器全部弄崩掉。所以它利用现代操作系统多进程不同地址空间这个设计，把它整个浏览器分为多进程，这样即使一个进程崩掉了，也不一定会让整个浏览器崩掉。Chromium进程分为一般分为两类：第一类，Browser进程，它管理tabs和插件进程以及运行主界面UI。第二类，Renderer进程，它利用WebKit布局引擎来解释和布局HTML。Browser是老大，只有一个；Renderer是小弟可以有很多个，每个小弟都能跟老大相互通信，但是小弟之间不能相互通信。老大和小弟们之间的关系如下。</p>
+<p><img src="/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/1.png" alt="1"></p>
+<p> 从上图可以看出每个Renderer进程都有一个RenderProcess对象，这个对象是用来管理整个Renderer进程的；与之对应的，Browser进程有许多RenderProcessHost对象，每个对象对应一个RenderProcess对象，也即是对应一个Renderer进程。</p>
+<h4 id="2-2多线程框架"><a href="#2-2多线程框架" class="headerlink" title="2.2多线程框架"></a>2.2多线程框架</h4><p>我们平时写程序也用多线程，其中一个常见的场景是把UI和费时处理过程分离，让他们拥有各自的线程。Chromium中的多线程基本是同理的，为了保证UI的快速响应，防止IO阻塞和费时计算而利用了多线程。但是我们在处理多线程共享资源的时候通常是利用锁，这容易引发各种莫名奇妙的问题，如死锁、优先级反转等。Chromium为了避免这些问题就少用锁，它有一些简单的约定：</p>
+<ol>
+<li>线程之间通过传递消息来交流(确切来说是传递任务)；</li>
+<li>对象只存在在一个线程上。</li>
+</ol>
+<p>BrowserProcess类是Browser进程的服务管理者，它控制着大多数的线程。通常程序运行在UI线程，但是我们把某些类型的处理放到其他线程。这些线程如下：</p>
+<p> ui_thread：应用程序启动时的主线程。</p>
+<p> io_thread：这个线程的名字有点令人费解。它是处理browser进程和所有子进程之间通信的调度线程。它也负责所有的资源请求（网页加载）的分发（见多进程架构）。</p>
+<p>file_thread：文件操作的通用线程。当你想执行阻塞文件系统的操作（例如，请求某种文件一个图标，把下载文件写到磁盘），会调用该线程。</p>
+<p> db_thread：数据库操作的线程。例如，Cookie服务在这个线程上使用SQLite操作。注意，历史数据库不使用该线程。</p>
+<p>本文也主要是讨论Browser上的线程何时启动的。更多关于Chromium进程和线程框架请参考：<br><a target="_blank" rel="noopener" href="http://www.chromium.org/developers/design-documents/multi-process-architecture">http://www.chromium.org/developers/design-documents/multi-process-architecture</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.chromium.org/developers/design-documents/threading">http://www.chromium.org/developers/design-documents/threading</a></p>
+<h3 id="3Browser多线程的创建和启动"><a href="#3Browser多线程的创建和启动" class="headerlink" title="3Browser多线程的创建和启动"></a>3Browser多线程的创建和启动</h3><p> 双击浏览器图标，我们启动了一个Chromium进程，这就是Browser进程。用C++编写的程序启动函数是main，Chromium当然也不例外。具体流程如下图所示:</p>
+<p><img src="/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/2.png" alt="2"></p>
+<p>其中,RunNamedProcessTypeMain是个很重要的函数<br>该函数定义于”content/public/app/content_main_runner.cc”文件。</p>
+<p>函数原型如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">RunNamedProcessTypeMain</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; process_type,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> MainFunctionParams&amp; main_function_params,</span></span></span><br><span class="line"><span class="function"><span class="params">    ContentMainDelegate* delegate)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>该函数内部定义了个静态结构体数组：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">static</span> <span class="keyword">const</span> MainFunction kMainFunctions[] = &#123;</span><br><span class="line">#<span class="keyword">if</span> !defined(CHROME_MULTIPLE_DLL_CHILD)</span><br><span class="line">    &#123; <span class="string">&quot;&quot;</span>,                            BrowserMain &#125;,</span><br><span class="line">#endif</span><br><span class="line">#<span class="keyword">if</span> !defined(CHROME_MULTIPLE_DLL_BROWSER)</span><br><span class="line">#<span class="keyword">if</span> defined(ENABLE_PLUGINS)</span><br><span class="line">    &#123; switches::kPluginProcess,      PluginMain &#125;,</span><br><span class="line">    &#123; switches::kWorkerProcess,      WorkerMain &#125;,</span><br><span class="line">    &#123; switches::kPpapiPluginProcess, PpapiPluginMain &#125;,</span><br><span class="line">    &#123; switches::kPpapiBrokerProcess, PpapiBrokerMain &#125;,</span><br><span class="line">#endif  <span class="comment">// ENABLE_PLUGINS</span></span><br><span class="line">    &#123; switches::kUtilityProcess,     UtilityMain &#125;,</span><br><span class="line">    &#123; switches::kRendererProcess,    RendererMain &#125;,</span><br><span class="line">    &#123; switches::kGpuProcess,         GpuMain &#125;,</span><br><span class="line">#endif  <span class="comment">// !CHROME_MULTIPLE_DLL_BROWSER</span></span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>该结构体有两个成员，一个是<code>const char process_type[]</code>表示进程类型，它从启动进程传入的参数解析得到；另一个是函数指针，表示该进程对应的主函数。对于Browser进程而言，它的启动参数是空的，解析出来<code>process_type</code>也是空的。我们从上面的结构体数组可以看到，空参数表示该进程的主函数是<code>BrowserMain</code>。我们再来看看<code>BrowserMain</code>中做了啥。主要代码如下所示：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">scoped_ptr&lt;BrowserMainRunner&gt; <span class="title">main_runner</span><span class="params">(BrowserMainRunner::Create())</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> exit_code = main_runner-&gt;Initialize(parameters);</span><br><span class="line"><span class="keyword">if</span> (exit_code &gt;= <span class="number">0</span>)</span><br><span class="line"><span class="keyword">return</span> exit_code;</span><br><span class="line"></span><br><span class="line">exit_code = main_runner-&gt;Run();</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看出该函数主要是创建了一个BrowserMainRunner对象，然后Initialize，紧接着Run。BrowserMainRunner的相关类图如下所示。</p>
+<p><img src="/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/3.png" alt="3"></p>
+<p>从类图可以看出BrowserMainRunner是个接口类，该类包含3个接口方法：Initialize、Run、Shutdown。其实现类是BrowserMainRunnerImpl。该类管理了一个BrowserMainLoop对象，通过控制BrowserMainLoop来控制该进程。我们可以发现BrowserMainLoop对象管理了许多线程对象，如：<code>main­­_thread</code>、<code>db_thread</code> 、<code>file_thread</code>等。这就是Browser进程中的主要线程对象。相关序列图如下图所示。</p>
+<p><img src="/assets/img/postImage/Chromium%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B-CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2/4.bmp" alt="4"></p>
+<p>main_runner在Initialize的时候创造了BrowserMainLoop对象，并调用了该对象的Initialize函数和CreateStartupTasks函数。而CreateStartupTask调用的时候创建了一个StartupTaskRunner对象，利用该对象来管理Startup Tasks，比如添加任务、执行任务。在此函数中就利用了AddTask来添加任务，其中一个重要的任务是CreateThreads，即把所有他管理的线程对象创建起来。该函数具体如下。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BrowserMainLoop::CreateStartupTasks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">//other code</span></span><br><span class="line">    StartupTask pre_create_threads =</span><br><span class="line">        base::Bind(&amp;BrowserMainLoop::PreCreateThreads, base::Unretained(<span class="keyword">this</span>));</span><br><span class="line">    startup_task_runner_-&gt;AddTask(pre_create_threads);</span><br><span class="line"></span><br><span class="line">    StartupTask create_threads =</span><br><span class="line">        base::Bind(&amp;BrowserMainLoop::CreateThreads, base::Unretained(<span class="keyword">this</span>));</span><br><span class="line">    startup_task_runner_-&gt;AddTask(create_threads);</span><br><span class="line"></span><br><span class="line">    StartupTask browser_thread_started = base::Bind(</span><br><span class="line">        &amp;BrowserMainLoop::BrowserThreadsStarted, base::Unretained(<span class="keyword">this</span>));</span><br><span class="line">    startup_task_runner_-&gt;AddTask(browser_thread_started);</span><br><span class="line"></span><br><span class="line">    StartupTask pre_main_message_loop_run = base::Bind(</span><br><span class="line">        &amp;BrowserMainLoop::PreMainMessageLoopRun, base::Unretained(<span class="keyword">this</span>));</span><br><span class="line">    startup_task_runner_-&gt;AddTask(pre_main_message_loop_run);</span><br><span class="line"></span><br><span class="line">    startup_task_runner_-&gt;RunAllTasksNow();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上就是Browser各种主要线程创建的时机。</p>
+<h3 id="4多进程的创建和启动"><a href="#4多进程的创建和启动" class="headerlink" title="4多进程的创建和启动"></a>4多进程的创建和启动</h3><p>上文我们已经提到，Chromium是一种多进程的程序，那除了双击启动的Browser进程，其它的小弟进程Renderer在哪里启动的呢？通过上文，我们知道每个Renderer都有个RenderProcess对象，相应的Browser上有于之对应的RenderProcessHost对象。追踪源码我们可以发现，在RenderProcessHostImpl类的Init函数中，有这样几行代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">child_process_launcher_.reset(<span class="keyword">new</span> ChildProcessLauncher(</span><br><span class="line">#<span class="keyword">if</span> defined(OS_WIN)</span><br><span class="line">        <span class="keyword">new</span> RendererSandboxedProcessLauncherDelegate,</span><br><span class="line">#elif defined(OS_POSIX)</span><br><span class="line">        renderer_prefix.empty(),</span><br><span class="line">        base::EnvironmentMap(),</span><br><span class="line">        channel_-&gt;TakeClientFileDescriptor(),</span><br><span class="line">#endif</span><br><span class="line">        cmd_line,</span><br><span class="line">        GetID(),</span><br><span class="line">        <span class="keyword">this</span>));</span><br></pre></td></tr></table></figure>
+
+<p>该函数new了一个ChildProcessLauncher对象，再看看对应的构造函数，里面有如下代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">context_ = <span class="keyword">new</span> Context();</span><br><span class="line">  context_-&gt;Launch(</span><br><span class="line">#<span class="keyword">if</span> defined(OS_WIN)</span><br><span class="line">      delegate,</span><br><span class="line">#elif defined(OS_ANDROID)</span><br><span class="line">      ipcfd,</span><br><span class="line">#elif defined(OS_POSIX)</span><br><span class="line">      use_zygote,</span><br><span class="line">      environ,</span><br><span class="line">      ipcfd,</span><br><span class="line">#endif</span><br><span class="line">      cmd_line,</span><br><span class="line">      child_process_id,</span><br><span class="line">      client);</span><br></pre></td></tr></table></figure>
+
+<p>Launch函数的内部又做了什么呢？代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">BrowserThread::PostTask(</span><br><span class="line">    BrowserThread::PROCESS_LAUNCHER, FROM_HERE,</span><br><span class="line">    base::Bind(</span><br><span class="line">        &amp;Context::LaunchInternal,</span><br><span class="line">        make_scoped_refptr(<span class="keyword">this</span>),</span><br><span class="line">        client_thread_id_,</span><br><span class="line">        child_process_id,</span><br><span class="line">        use_zygote,</span><br><span class="line">        environ,</span><br><span class="line">        ipcfd,</span><br><span class="line">        cmd_line));</span><br></pre></td></tr></table></figure>
+
+<p>可以看出它PostTask到BrowserThread::PROCESS_LAUNCHER，让其执行Context ::LaunchInternal任务。再来看看这个函数，里面有一行：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> launched = base::LaunchProcess(*cmd_line, options, &amp;handle);</span><br></pre></td></tr></table></figure>
+
+<p>这个函数调用fork()然后execvp ()启动了子进程。子进程会执行上文的RunNamedProcessTypeMain函数，但是这次它是带执行参数的，所以不会进入BrowserMain函数，而是进入其它函数，如：RendererMain等。以上就是子进程的启动流程了。</p>
+<h3 id="5总结"><a href="#5总结" class="headerlink" title="5总结"></a>5总结</h3><p>Browser多线程启动</p>
+<ol>
+<li>Browser主函数是BrowserMain，该函数创建了一个BrowserMainRunnerImpl对象，同时执行了该对象的Initialize函数；</li>
+<li>BrowserMainRunnerImpl的Initialize创建了一个BrowserMainLoop对象，同时执行了该对象的Init和CreateStartupTasks函数；</li>
+<li>BrowserMainLoop的CreateStartupTasks添加了一堆任务，其中一个任务就是CreateThreads函数；</li>
+<li>在CreateThreads函数中会初始化各种线程对象，并且StartWithOptions。</li>
+</ol>
+<p>Chromium多进程</p>
+<ol>
+<li>双击Chromium图标启动第一个进程，即Browser进程；</li>
+<li>Browser进程中RenderProcessHostImpl对象的Init函数会new一个ChildProcessLauncher对象，该对象来管理子进程的启动；</li>
+<li>ChildProcessLauncher构造过程中会借助其Context对象，Post一个Task到PROCESS_LAUNCHER线程；</li>
+<li>Task会执行base::LaunchProcess,该函数调用fork()然后execvp ()启动了子进程；</li>
+<li>启动的子进程是带参数的，这次在执行RunNamedProcessTypeMain的时候不会进入BrowserMain，而是进入其对应的主函数。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2014/01/06/2014-01-06-%20%E4%BB%8EC++%E5%88%B0Objective-C%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/" rel="prev" title="从C++到Objective-C的学习笔记(CSDN早期博客)">
+      <i class="fa fa-chevron-left"></i> 从C++到Objective-C的学习笔记(CSDN早期博客)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2014/09/26/2014-09-26-iOS%20Nimbus%E6%A1%86%E6%9E%B6tableview%E9%83%A8%E5%88%86%E8%A7%A3%E8%AF%BB(CSDN%E6%97%A9%E6%9C%9F%E5%8D%9A%E5%AE%A2)/" rel="next" title="iOS Nimbus框架tableview部分解读(CSDN早期博客)">
+      iOS Nimbus框架tableview部分解读(CSDN早期博客) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86"><span class="nav-number">2.</span> <span class="nav-text">2背景知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1%E5%A4%9A%E8%BF%9B%E7%A8%8B%E6%A1%86%E6%9E%B6"><span class="nav-number">2.1.</span> <span class="nav-text">2.1多进程框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A1%86%E6%9E%B6"><span class="nav-number">2.2.</span> <span class="nav-text">2.2多线程框架</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3Browser%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E5%90%AF%E5%8A%A8"><span class="nav-number">3.</span> <span class="nav-text">3Browser多线程的创建和启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E5%90%AF%E5%8A%A8"><span class="nav-number">4.</span> <span class="nav-text">4多进程的创建和启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
