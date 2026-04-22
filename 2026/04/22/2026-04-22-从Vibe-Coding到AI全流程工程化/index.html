@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="同一个需求，三种做法，完全不同的结果。这篇文章分享我们终端团队从”让 AI 写代码”到”让 AI 参与工程全流程”的实践路径。   写在前面我们是一个终端团队，工作区下面挂了多个组件仓——基础层、业务层、调试工具，宿主仓负责装配。 过去一年，我们逐步把 AI 编程助手接入了开发流程。不是简单让 AI 写代码，而是从需求抓取到代码归档，每个环节都有 AI 参与。 这篇文章会讲四件事：  三种模式有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2026-04-22 从Vibe-Coding到AI全流程工程化">
+<meta property="og:url" content="http://yoursite.com/2026/04/22/2026-04-22-%E4%BB%8EVibe-Coding%E5%88%B0AI%E5%85%A8%E6%B5%81%E7%A8%8B%E5%B7%A5%E7%A8%8B%E5%8C%96/index.html">
+<meta property="og:site_name" content="宿于松下的技术博客">
+<meta property="og:description" content="同一个需求，三种做法，完全不同的结果。这篇文章分享我们终端团队从”让 AI 写代码”到”让 AI 参与工程全流程”的实践路径。   写在前面我们是一个终端团队，工作区下面挂了多个组件仓——基础层、业务层、调试工具，宿主仓负责装配。 过去一年，我们逐步把 AI 编程助手接入了开发流程。不是简单让 AI 写代码，而是从需求抓取到代码归档，每个环节都有 AI 参与。 这篇文章会讲四件事：  三种模式有">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-22T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-22T11:06:16.840Z">
+<meta property="article:author" content="宿于松下">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="终端">
+<meta property="article:tag" content="工程化">
+<meta property="article:tag" content="Cursor">
+<meta property="article:tag" content="Claude Code">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2026/04/22/2026-04-22-%E4%BB%8EVibe-Coding%E5%88%B0AI%E5%85%A8%E6%B5%81%E7%A8%8B%E5%B7%A5%E7%A8%8B%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>2026-04-22 从Vibe-Coding到AI全流程工程化 | 宿于松下的技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">宿于松下的技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">20</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2026/04/22/2026-04-22-%E4%BB%8EVibe-Coding%E5%88%B0AI%E5%85%A8%E6%B5%81%E7%A8%8B%E5%B7%A5%E7%A8%8B%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/common/avatar.jpg">
+      <meta itemprop="name" content="宿于松下">
+      <meta itemprop="description" content="行有不得反求诸己">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宿于松下的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2026-04-22 从Vibe-Coding到AI全流程工程化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-04-22 21:00:00 / 修改时间：19:06:16" itemprop="dateCreated datePublished" datetime="2026-04-22T21:00:00+08:00">2026-04-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>同一个需求，三种做法，完全不同的结果。这篇文章分享我们终端团队从”让 AI 写代码”到”让 AI 参与工程全流程”的实践路径。</p>
+</blockquote>
+<hr>
+<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>我们是一个终端团队，工作区下面挂了多个组件仓——基础层、业务层、调试工具，宿主仓负责装配。</p>
+<p>过去一年，我们逐步把 AI 编程助手接入了开发流程。不是简单让 AI 写代码，而是<strong>从需求抓取到代码归档，每个环节都有 AI 参与</strong>。</p>
+<p>这篇文章会讲四件事：</p>
+<ol>
+<li><strong>三种模式有什么不同</strong>——纯人肉 / Vibe Coding / AI 全流程工程化</li>
+<li><strong>为什么 Vibe Coding 不够用</strong>——我们踩过的核心问题</li>
+<li><strong>全流程工程化具体怎么做</strong>——每个环节的工具、规则和产物</li>
+<li><strong>怎么一步步走到这里</strong>——学习路线和经验教训</li>
+</ol>
+<hr>
+<h2 id="一、三种模式：同一个需求，三种命运"><a href="#一、三种模式：同一个需求，三种命运" class="headerlink" title="一、三种模式：同一个需求，三种命运"></a>一、三种模式：同一个需求，三种命运</h2><p>产品在钉钉丢过来一个 PRD：「换肤配置」——用户可以为游戏选择不同的皮肤主题。需求涉及：UI 换肤逻辑、主题资源包下载、配置后台对接、异常降级。跨了宿主仓和业务组件仓。</p>
+<p>同样的需求，三种模式下会发生什么？</p>
+<h3 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>一句话</th>
+<th>AI 的角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>纯人肉</strong></td>
+<td>从头到尾自己干</td>
+<td>没有 AI</td>
+</tr>
+<tr>
+<td><strong>Vibe Coding</strong></td>
+<td>让 AI 写代码，我指挥</td>
+<td>打字员，你说它写</td>
+</tr>
+<tr>
+<td><strong>AI 全流程工程化</strong></td>
+<td>AI 参与每个环节，受规则约束</td>
+<td>全流程协作者，有边界有规矩</td>
+</tr>
+</tbody></table>
+<h3 id="逐环节对比"><a href="#逐环节对比" class="headerlink" title="逐环节对比"></a>逐环节对比</h3><p><strong>1. 需求获取</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PRD 获取</strong></td>
+<td>手动阅读，脑子记</td>
+<td>复制文字粘贴给 AI</td>
+<td>自动截图抓取，AI 可读</td>
+</tr>
+<tr>
+<td><strong>API 获取</strong></td>
+<td>手动抄字段</td>
+<td>复制粘贴</td>
+<td>自动抓取，结构化 JSON</td>
+</tr>
+<tr>
+<td><strong>原型图</strong></td>
+<td>截图存本地</td>
+<td>AI 看不到</td>
+<td>合并截图，AI 可读</td>
+</tr>
+<tr>
+<td><strong>信息完整度</strong></td>
+<td>依赖人的记忆力</td>
+<td>只有文字，丢图</td>
+<td>完整保留</td>
+</tr>
+</tbody></table>
+<p><strong>2. 需求评审</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>谁在审</strong></td>
+<td>开发自己审</td>
+<td>没人审</td>
+<td>AI 先审，结构化评审</td>
+</tr>
+<tr>
+<td><strong>什么时候发现问题</strong></td>
+<td>做到一半</td>
+<td>测试阶段</td>
+<td>编码之前</td>
+</tr>
+<tr>
+<td><strong>返工成本</strong></td>
+<td>中等</td>
+<td>最高（写完重来）</td>
+<td>最低（提前拦截）</td>
+</tr>
+</tbody></table>
+<p><strong>3. 方案设计</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>有没有方案文档</strong></td>
+<td>在脑子里</td>
+<td>没有</td>
+<td>有，结构化产物</td>
+</tr>
+<tr>
+<td><strong>AI 什么时候介入</strong></td>
+<td>不介入</td>
+<td>直接写代码</td>
+<td>先设计，再实现</td>
+</tr>
+<tr>
+<td><strong>方向偏了什么时候发现</strong></td>
+<td>写到一半</td>
+<td>写完</td>
+<td>动手之前</td>
+</tr>
+</tbody></table>
+<p><strong>4. 编码实现</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>代码产出速度</strong></td>
+<td>慢</td>
+<td>快</td>
+<td>快</td>
+</tr>
+<tr>
+<td><strong>是否符合项目规范</strong></td>
+<td>靠人记</td>
+<td>经常不符合</td>
+<td>规则约束，首次即对</td>
+</tr>
+<tr>
+<td><strong>修规范问题的成本</strong></td>
+<td>无（自己写的）</td>
+<td>高（可能和写代码一样久）</td>
+<td>低（规则前置约束）</td>
+</tr>
+<tr>
+<td><strong>净效率</strong></td>
+<td>基线</td>
+<td>看起来快，实际未必</td>
+<td>最高</td>
+</tr>
+</tbody></table>
+<p><strong>5. 代码审查</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>审查覆盖面</strong></td>
+<td>看什么算什么</td>
+<td>表面风格</td>
+<td>领域专项 + 项目约束</td>
+</tr>
+<tr>
+<td><strong>能否发现性能问题</strong></td>
+<td>靠经验</td>
+<td>几乎不能</td>
+<td>内置检查项</td>
+</tr>
+<tr>
+<td><strong>结果可执行性</strong></td>
+<td>模糊</td>
+<td>模糊</td>
+<td>带严重级别，明确动作</td>
+</tr>
+</tbody></table>
+<p><strong>6. 工程规范</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>分支名/Commit 规范</strong></td>
+<td>靠自觉</td>
+<td>AI 不知道规范</td>
+<td>规则约束，自动合规</td>
+</tr>
+<tr>
+<td><strong>组件联调</strong></td>
+<td>手动重复操作</td>
+<td>AI 不会</td>
+<td>一个命令自动化</td>
+</tr>
+</tbody></table>
+<p><strong>7. 变更归档</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>纯人肉</th>
+<th>Vibe Coding</th>
+<th>全流程工程化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>方案文档</strong></td>
+<td>无</td>
+<td>无</td>
+<td>有，结构化归档</td>
+</tr>
+<tr>
+<td><strong>设计取舍记录</strong></td>
+<td>在脑子里/会议纪要</td>
+<td>无</td>
+<td>design.md</td>
+</tr>
+<tr>
+<td><strong>新人接手成本</strong></td>
+<td>高</td>
+<td>高</td>
+<td>低</td>
+</tr>
+</tbody></table>
+<h3 id="同一个需求，从收到-PRD-到上线"><a href="#同一个需求，从收到-PRD-到上线" class="headerlink" title="同一个需求，从收到 PRD 到上线"></a>同一个需求，从收到 PRD 到上线</h3><p><strong>纯人肉：5 天</strong></p>
+<p>Day 1 看 PRD，脑子想方案 → Day 2-3 写代码 → Day 4 做到一半发现 PRD 没写异常降级，停下来等产品 → Day 5 补完逻辑，提交 MR。没有方案文档，半年后新人问「为什么这么设计」，没人答得上来。</p>
+<p><strong>Vibe Coding：看起来 2 天，实际 4 天</strong></p>
+<p>Day 1 把 PRD 文字贴给 AI，产出很快 → Day 2 发现 AI 把代码写错了仓，用了错误的技术栈，手动改 → Day 3 测试发现异常降级没做，补代码 → Day 4 AI review 说「代码不错」，但测试提了 5 个 bug，逐个修。没有方案文档，没有需求评审记录。</p>
+<p><strong>AI 全流程工程化：3 天（含前期准备）</strong></p>
+<p>Day 1 上午抓 PRD 和 API，AI 评审发现 3 个 P0 阻塞项 → Day 1 下午拿评审报告找产品补需求，同时走变更流程：proposal → design → tasks → Day 2 按任务清单编码，AI 在规则约束下首次即对仓、对技术栈 → Day 3 AI 审查发现 1 个严重项，修完提交 MR，归档变更。3 天完成，<strong>产出不仅是一段代码</strong>，还有需求评审报告、方案文档、任务清单、代码审查记录、能力基线。</p>
+<hr>
+<h2 id="二、为什么-Vibe-Coding-不够用"><a href="#二、为什么-Vibe-Coding-不够用" class="headerlink" title="二、为什么 Vibe Coding 不够用"></a>二、为什么 Vibe Coding 不够用</h2><p>看到上面的对比，你可能会问：Vibe Coding 不是挺快的吗？为什么还要搞全流程工程化？</p>
+<p>我们不是一开始就做全流程工程化的。路径是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">纯人肉 → 觉得效率低 → 引入 AI → Vibe Coding → 发现问题 → 全流程工程化</span><br></pre></td></tr></table></figure>
+
+<p>从纯人肉到 Vibe Coding 的动力很简单：AI 写代码快，这谁都知道。但从 Vibe Coding 到全流程工程化，原因更值得说：</p>
+<h3 id="1-AI-写得快但改得慢"><a href="#1-AI-写得快但改得慢" class="headerlink" title="1. AI 写得快但改得慢"></a>1. AI 写得快但改得慢</h3><p>它不知道团队的规范——用哪个网络库、解析库、埋点 SDK。产出越多，修正成本越高。你花了和 AI 写代码一样长的时间，在修这些”风格不对”的问题。</p>
+<h3 id="2-AI-不会质疑需求"><a href="#2-AI-不会质疑需求" class="headerlink" title="2. AI 不会质疑需求"></a>2. AI 不会质疑需求</h3><p>你让它做，它就做。PRD 没写异常降级？它不管。交互细节缺失？它按自己理解补。做到一半发现方向偏了，浪费更大。</p>
+<h3 id="3-AI-没有上下文"><a href="#3-AI-没有上下文" class="headerlink" title="3. AI 没有上下文"></a>3. AI 没有上下文</h3><p>PRD 在钉钉，API 在 ShowDoc，设计稿在 Figma——这些都在外部系统里，AI 看不到。写出来的代码凭想象，复制粘贴又丢图丢结构。</p>
+<h3 id="4-AI-审查自己写的代码是无效的"><a href="#4-AI-审查自己写的代码是无效的" class="headerlink" title="4. AI 审查自己写的代码是无效的"></a>4. AI 审查自己写的代码是无效的</h3><p>让 AI review 自己写的代码，它当然觉得不错。通用 review 说”这个函数有点长”——帮助不大。真正的问题没人发现：启动链路阻塞、UI 线程卡顿、网络层不合规。</p>
+<h3 id="5-没有文档的代码就是技术债"><a href="#5-没有文档的代码就是技术债" class="headerlink" title="5. 没有文档的代码就是技术债"></a>5. 没有文档的代码就是技术债</h3><p>AI 写的代码尤其如此——因为没人完整理解它。半年后新人问「为什么这么设计」，git log 里只有一堆看不出意图的 commit。</p>
+<hr>
+<p><strong>全流程工程化的本质，不是给 AI 加更多限制，而是把 AI 从”打字员”升级为”带规矩的协作者”：</strong></p>
+<ul>
+<li>它知道该改哪个仓（归属路由）</li>
+<li>它知道该用什么技术栈（规则约束）</li>
+<li>它知道需求有没有漏洞（PRD 评审）</li>
+<li>它知道代码有没有隐患（领域化审查）</li>
+<li>它知道做完之后要留下什么（变更归档）</li>
+</ul>
+<hr>
+<h2 id="三、全流程工程化：具体怎么做"><a href="#三、全流程工程化：具体怎么做" class="headerlink" title="三、全流程工程化：具体怎么做"></a>三、全流程工程化：具体怎么做</h2><h3 id="1-工具选型：三把刀，但只磨一块磨刀石"><a href="#1-工具选型：三把刀，但只磨一块磨刀石" class="headerlink" title="1. 工具选型：三把刀，但只磨一块磨刀石"></a>1. 工具选型：三把刀，但只磨一块磨刀石</h3><p>团队里 Cursor、Claude Code、Kiro 都在用，不强求统一工具，但有一个原则必须统一：<strong>AI 规则只维护一份，所有工具共享</strong>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.cursor&#x2F;rules&#x2F;*.mdc          ←  核心规则定义（唯一真实来源）</span><br><span class="line">       │</span><br><span class="line">       ├──镜像──→  .kiro&#x2F;steering&#x2F;*.md      （Kiro 消费）</span><br><span class="line">       │</span><br><span class="line">       └──分流──→  CLAUDE.md                （Claude Code 消费）</span><br></pre></td></tr></table></figure>
+
+<p>规则写在 <code>.cursor/rules/</code>，这是唯一的”磨刀石”。<code>.kiro/steering/</code> 是镜像给 Kiro 用的，<code>CLAUDE.md</code> 是分流入口告诉 Claude Code 遇到什么问题去看哪个规则。</p>
+<p>早期各子仓自己带了 <code>.cursorrules</code>、<code>.kiro/</code>、<code>.trae/</code>，结果不同工具看到的规则不一致，AI 行为不可预测。后来我们专门做了一个变更把子仓的 AI 配置全部清理掉，统一收敛到工作区根目录。<strong>教训：子仓零配置，根目录统一定义。</strong></p>
+<h3 id="2-多仓架构：让-AI-知道”这事不归你管”"><a href="#2-多仓架构：让-AI-知道”这事不归你管”" class="headerlink" title="2. 多仓架构：让 AI 知道”这事不归你管”"></a>2. 多仓架构：让 AI 知道”这事不归你管”</h3><p>AI 助手最常犯的错：你让它修一个属于组件仓的 bug，它直接在宿主仓里加了个 workaround。这在多仓架构里是灾难。</p>
+<p>我们给 AI 写了一个<strong>归属判断路由器</strong>，而不是把所有规则扁平堆在一起：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">任务进来</span><br><span class="line">  ├── 宿主仓的事？        → 看宿主仓规则</span><br><span class="line">  ├── 基础层的事？        → 看基础层规则</span><br><span class="line">  ├── 业务层的事？        → 看业务层规则</span><br><span class="line">  ├── 调试工具的事？      → 看调试工具规则</span><br><span class="line">  └── 共享基线            → 始终生效</span><br></pre></td></tr></table></figure>
+
+<p>AI 在动手之前会先走这个路由，判断该改哪里。越界改仓的情况大幅减少。</p>
+<h3 id="3-需求阶段：把外部文档搬进-AI-的视野"><a href="#3-需求阶段：把外部文档搬进-AI-的视野" class="headerlink" title="3. 需求阶段：把外部文档搬进 AI 的视野"></a>3. 需求阶段：把外部文档搬进 AI 的视野</h3><p>我们的 PRD 写在钉钉文档，API 文档写在 ShowDoc。这些都在外部系统里，AI 看不到。</p>
+<p>两个 Playwright 自动化技能解决了这个问题：</p>
+<ul>
+<li><strong>dd-prd-claw</strong>：钉钉文档 → 慢滑截图 → 去重合并 → AI 可读的完整 PRD（包括原型图和标注）</li>
+<li><strong>dd-api-claw</strong>：ShowDoc → 提取文本 → 结构化 JSON（同时产出纯文本和 JSON，方便不同场景消费）</li>
+</ul>
+<p>抓取后的文档就在工作区里，AI 助手可以直接读取。不需要人工搬运。</p>
+<h3 id="4-PRD-评审：让-AI-先审需求，再写代码"><a href="#4-PRD-评审：让-AI-先审需求，再写代码" class="headerlink" title="4. PRD 评审：让 AI 先审需求，再写代码"></a>4. PRD 评审：让 AI 先审需求，再写代码</h3><p>开发做到一半才发现 PRD 没写清楚某个交互细节——这是最常见的返工原因。</p>
+<p><code>dd-prd-judge</code> 对抓取的 PRD 做实现前评审：</p>
+<table>
+<thead>
+<tr>
+<th>评审维度</th>
+<th>审什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户流程</td>
+<td>核心路径完整吗？分支流程覆盖了吗？</td>
+</tr>
+<tr>
+<td>交互规格</td>
+<td>状态切换、动画、手势写清楚了吗？</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>计算逻辑、边界条件定义了吗？</td>
+</tr>
+<tr>
+<td>数据契约</td>
+<td>字段定义、必填/选填、枚举值给了吗？</td>
+</tr>
+<tr>
+<td>异常处理</td>
+<td>断网、超时、降级描述了吗？</td>
+</tr>
+<tr>
+<td>验收标准</td>
+<td>有没有可执行的测试用例？</td>
+</tr>
+</tbody></table>
+<p>风险分级：P0（阻塞开发，必须补）→ P1（必然返工，当前迭代补）→ P2（不阻塞，开发中补）→ P3（建议优化，后续处理）。</p>
+<p><strong>实际案例</strong>：「换肤配置」PRD 评审得分 58/100，标注了多个 P0 阻塞项——用户流程不完整、交互规格缺失、异常处理未覆盖。这些问题在编码前就被拦截了。</p>
+<h3 id="5-变更管理：让每一步都有据可查"><a href="#5-变更管理：让每一步都有据可查" class="headerlink" title="5. 变更管理：让每一步都有据可查"></a>5. 变更管理：让每一步都有据可查</h3><p>以前做功能，经常是”PRD 丢过来 → 直接写代码 → 写完发现方向偏了”。我们引入了 spec-driven 模式，给变更流程加上结构化中间产物：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">proposal.md ──→ delta spec ──→ design.md ──→ tasks.md</span><br><span class="line">     │                                          │</span><br><span class="line">     │  为什么要改？               具体怎么实现？  │</span><br><span class="line">     │  改什么能力？               任务拆分        │</span><br><span class="line">     │                              │           │</span><br><span class="line">     │                              ▼           ▼</span><br><span class="line">     │                        实现 &amp; verify</span><br><span class="line">     │                              │</span><br><span class="line">     │                              ▼</span><br><span class="line">     │                        archive（归档）</span><br><span class="line">     │                              │</span><br><span class="line">     │                              ▼</span><br><span class="line">     └── ── ── ── ── ── ──→ sync delta → main spec</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>产物</th>
+<th>回答的问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>proposal.md</code></td>
+<td>为什么要做？改什么？影响范围？</td>
+</tr>
+<tr>
+<td><code>delta spec</code></td>
+<td>新增/变更了什么能力？</td>
+</tr>
+<tr>
+<td><code>design.md</code></td>
+<td>技术方案是什么？影响哪些模块？</td>
+</tr>
+<tr>
+<td><code>tasks.md</code></td>
+<td>具体要做哪些事？优先级怎么排？</td>
+</tr>
+</tbody></table>
+<p>归档后，delta spec 合入 main spec。下次再改同一块能力时，AI 能看到历史基线。半年后新人接手，看归档就知道当初的设计取舍。</p>
+<p>最大的变化是：**AI 不再直接写代码，而是先过一遍”为什么要做、怎么做、分几步”**。</p>
+<h3 id="6-工程自动化：把团队规范写进-AI-的肌肉记忆"><a href="#6-工程自动化：把团队规范写进-AI-的肌肉记忆" class="headerlink" title="6. 工程自动化：把团队规范写进 AI 的肌肉记忆"></a>6. 工程自动化：把团队规范写进 AI 的肌肉记忆</h3><p><strong>Git 工作流规范</strong></p>
+<table>
+<thead>
+<tr>
+<th>规范</th>
+<th>规则</th>
+<th>AI 行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>分支名</td>
+<td><code>feature/[任务号]-中文描述</code></td>
+<td>AI 创建分支时自动遵循</td>
+</tr>
+<tr>
+<td>Commit</td>
+<td><code>-#任务号 提交信息</code></td>
+<td>AI 写 commit 时自动带任务号</td>
+</tr>
+<tr>
+<td>推送保护</td>
+<td>禁止推 master/develop</td>
+<td>AI 推送前检查分支名</td>
+</tr>
+</tbody></table>
+<p><strong>多仓组件联调</strong></p>
+<p>联调时切本地源码，以前要手动读 Podfile 版本 → 去组件仓 checkout 对应 tag → 写本地配置文件，多个组件仓重复操作。现在一个命令搞定，支持 <code>--dry-run</code> 预览。</p>
+<p><strong>AI 生成的 commit 和分支不再需要人工修正格式。</strong></p>
+<h3 id="7-代码审查：不是通用-review，是领域专家-review"><a href="#7-代码审查：不是通用-review，是领域专家-review" class="headerlink" title="7. 代码审查：不是通用 review，是领域专家 review"></a>7. 代码审查：不是通用 review，是领域专家 review</h3><p>通用 AI 代码审查会说”这个函数太长了”——帮助不大。我们关心的是：会不会影响启动速度？会不会卡 UI 线程？有没有走规定的网络层？</p>
+<p>以下是我们在移动端的实践，思路可迁移到其他终端领域：</p>
+<p><code>dd-code-review</code> 内置了质量六维模型：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>典型问题（以移动端为例）</th>
+<th>严重级别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动性能</td>
+<td>应用启动时同步读磁盘/发请求</td>
+<td><code>[严重]</code></td>
+</tr>
+<tr>
+<td>流畅度</td>
+<td>列表滚动时重复创建视图</td>
+<td><code>[主要]</code></td>
+</tr>
+<tr>
+<td>稳定性</td>
+<td>强制解包服务端可选字段</td>
+<td><code>[严重]</code></td>
+</tr>
+<tr>
+<td>耗电</td>
+<td>后台未停止的定时器</td>
+<td><code>[主要]</code></td>
+</tr>
+<tr>
+<td>网络</td>
+<td>相同请求未复用缓存</td>
+<td><code>[次要]</code></td>
+</tr>
+<tr>
+<td>发布风险</td>
+<td>Release 包含调试入口</td>
+<td><code>[严重]</code></td>
+</tr>
+</tbody></table>
+<p>还内置了项目级约束检查：网络请求是否走了规定的网络层？解析是否用了规定的解析库？埋点是否接了规定的监控 SDK？</p>
+<p>审查结果带严重级别：<code>[严重]</code> 必须修、<code>[主要]</code> 应当修、<code>[次要]</code> 建议修、<code>[挑刺]</code> 可忽略。<strong>不再是泛泛的代码风格建议，而是带业务上下文的可执行行动项。</strong></p>
+<h3 id="8-全流程串起来"><a href="#8-全流程串起来" class="headerlink" title="8. 全流程串起来"></a>8. 全流程串起来</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">钉钉 PRD ──┐                              ┌── 代码审查 ──→ 合入</span><br><span class="line">            │                              │</span><br><span class="line">ShowDoc ───┤                              │</span><br><span class="line">            ▼                              │</span><br><span class="line">      ┌──────────┐                   ┌─────┴─────┐</span><br><span class="line">      │ PRD 抓取  │                   │  编码实现   │</span><br><span class="line">      │ + API抓取 │                   │ (规则约束)  │</span><br><span class="line">      └────┬─────┘                   └─────┬─────┘</span><br><span class="line">           │                               │</span><br><span class="line">           ▼                               │</span><br><span class="line">      ┌──────────┐                   ┌─────┴─────┐</span><br><span class="line">      │ PRD 评审  │                   │  工程自动化  │</span><br><span class="line">      │ (门禁)    │                   │ (Git&#x2F;组件)  │</span><br><span class="line">      └────┬─────┘                   └─────┬─────┘</span><br><span class="line">           │                               │</span><br><span class="line">           ▼                               ▼</span><br><span class="line">      ┌──────────┐                   ┌───────────┐</span><br><span class="line">      │ 方案提议  │──────────────────→│  变更归档   │</span><br><span class="line">      │ + 设计    │                   │ + Spec同步  │</span><br><span class="line">      │ + 任务拆分 │                   └───────────┘</span><br><span class="line">      └──────────┘</span><br><span class="line"></span><br><span class="line">◄─────── spec-driven 变更流程 ──────────────────►</span><br></pre></td></tr></table></figure>
+
+<p>一句话：<strong>需求进来 → 先抓取 → 再评审 → 然后设计拆任务 → 编码（受规则约束+工程自动化）→ 审查 → 归档</strong>。AI 参与了每一个环节。</p>
+<hr>
+<h2 id="四、学习路线：从用到工程化"><a href="#四、学习路线：从用到工程化" class="headerlink" title="四、学习路线：从用到工程化"></a>四、学习路线：从用到工程化</h2><p>前面是我们的实践结果，但团队不是一步到位的。这条路怎么走？我们总结了三个阶段：</p>
+<h3 id="阶段一：上手（1-2-周）——-先用起来"><a href="#阶段一：上手（1-2-周）——-先用起来" class="headerlink" title="阶段一：上手（1-2 周）—— 先用起来"></a>阶段一：上手（1-2 周）—— 先用起来</h3><p><strong>目标：让 AI 参与每天的开发工作，建立基本手感</strong></p>
+<ul>
+<li>两个工具都要会：Cursor 擅长编辑器内实时辅助，Claude Code 擅长终端级多文件任务，从真实小任务开始</li>
+<li>核心习惯：<strong>小步给指令，每步 review</strong>——不要一次性甩一个大需求</li>
+<li>给项目写 Rules（Cursor 的 <code>.cursor/rules</code> / Claude Code 的 <code>CLAUDE.md</code>），让 AI 懂你的项目约定</li>
+<li>关键体感：Rules 越具体，AI 输出越稳定</li>
+</ul>
+<p><strong>自测验证：</strong></p>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>达标线</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>两个工具都能用</td>
+<td>Cursor 能独立完成行内编辑 + 上下文引用；Claude Code 能产出可直接 review 的 PR</td>
+</tr>
+<tr>
+<td>工具选择合理</td>
+<td>回顾最近 5 次任务，至少 3 次选择合理（编辑器内小改用 Cursor，跨文件/终端任务用 Claude Code）</td>
+</tr>
+<tr>
+<td>Rules 生效</td>
+<td>有 Rules 时 AI 输出明显更贴合项目约定</td>
+</tr>
+</tbody></table>
+<h3 id="阶段二：提效（2-4-周）——-改变工作方式"><a href="#阶段二：提效（2-4-周）——-改变工作方式" class="headerlink" title="阶段二：提效（2-4 周）—— 改变工作方式"></a>阶段二：提效（2-4 周）—— 改变工作方式</h3><p><strong>目标：从”AI 写代码”升级为”你写 Spec，AI 实现”</strong></p>
+<p>最核心的方法论是 <strong>Spec 编程</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 → 写 Spec → AI 出方案 → 你确认 → AI 写代码 → 你审查</span><br></pre></td></tr></table></figure>
+
+<p>Spec 越清楚，AI 输出越靠谱；模糊输入 = 随机输出。</p>
+<p><strong>Prompt 质量是 Spec 编程的基础：</strong></p>
+<ul>
+<li>好的 Prompt = 清晰目标 + 充分上下文 + 明确约束</li>
+<li>太模糊或太详细都不行，给方向和边界，让 AI 决定实现</li>
+<li>常见反例：<ul>
+<li>“优化一下这个函数” → AI 不知道优化性能？可读性？兼容性？</li>
+<li>“帮我写个登录页” → 缺少技术栈、设计规范、接口约定，输出不可控</li>
+<li>“按照第一行到第三行的方式，写第四行” → 逐行指挥，不如描述整体模式让 AI 批量处理</li>
+</ul>
+</li>
+</ul>
+<p><strong>自测验证：</strong></p>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>达标线</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Spec 驱动开发</td>
+<td>产出 Spec 文档 + AI 生成的代码，代码一次通过 review 或仅需微调</td>
+</tr>
+<tr>
+<td>Prompt 质量</td>
+<td>结构化 Prompt 输出的可用性明显高于随意版</td>
+</tr>
+<tr>
+<td>Spec 精度</td>
+<td>精确版 Spec 的返工次数明显少于粗略版</td>
+</tr>
+</tbody></table>
+<h3 id="阶段三：整合（持续）——-让-AI-融入工具链"><a href="#阶段三：整合（持续）——-让-AI-融入工具链" class="headerlink" title="阶段三：整合（持续）—— 让 AI 融入工具链"></a>阶段三：整合（持续）—— 让 AI 融入工具链</h3><p><strong>目标：AI 不只是聊天窗口，而是连接设计、数据、服务的入口</strong></p>
+<ul>
+<li><strong>MCP</strong>：让 AI 直连 Figma、数据库、内部 API，从”盲猜”变”有据可依”</li>
+<li><strong>Skills / Hooks</strong>：把重复动作自动化——代码审查、安全检查、循环任务</li>
+<li><strong>Rules 迭代</strong>：阶段一写了初版 Rules，现在根据 AI 犯过的错持续迭代，让 Rules 越来越精准</li>
+</ul>
+<p><strong>自测验证：</strong></p>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>达标线</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Skills 使用</td>
+<td>每个 Skill 产出可观察的结果（如 <code>/simplify</code> 后代码行数减少、<code>/review</code> 发现实际问题）</td>
+</tr>
+<tr>
+<td>Rules 迭代</td>
+<td>至少完成 2 次”犯错→补 Rule→验证生效”的闭环</td>
+</tr>
+<tr>
+<td>MCP 接入</td>
+<td>AI 借助 MCP 产出的结果准确性高于无 MCP 时</td>
+</tr>
+</tbody></table>
+<h3 id="贯穿始终的关键认知"><a href="#贯穿始终的关键认知" class="headerlink" title="贯穿始终的关键认知"></a>贯穿始终的关键认知</h3><table>
+<thead>
+<tr>
+<th>认知</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>你决策，AI 执行</td>
+<td>你负责思考和决策，AI 负责执行和扩展</td>
+</tr>
+<tr>
+<td>Spec &gt; 逐行指挥</td>
+<td>写清楚”要什么”，比指挥”怎么写”效率高得多</td>
+</tr>
+<tr>
+<td>Rules 是杠杆</td>
+<td>一次写好，每次对话都生效，投入产出比最高</td>
+</tr>
+<tr>
+<td>小步迭代</td>
+<td>一次一个明确指令，逐步推进，每步确认</td>
+</tr>
+<tr>
+<td>审查不可省略</td>
+<td>AI 生成的代码必须 review，你是最终责任人</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、踩过的坑和当前局限"><a href="#五、踩过的坑和当前局限" class="headerlink" title="五、踩过的坑和当前局限"></a>五、踩过的坑和当前局限</h2><h3 id="踩过的坑"><a href="#踩过的坑" class="headerlink" title="踩过的坑"></a>踩过的坑</h3><table>
+<thead>
+<tr>
+<th>坑</th>
+<th>教训</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>规则扁平堆砌</td>
+<td>AI 不知该看哪条，经常忽略重要约束 → 改为分层路由（归属判断）</td>
+</tr>
+<tr>
+<td>让 AI 直接写代码</td>
+<td>写完发现方向偏了，返工更大 → 先走 proposal → design → tasks</td>
+</tr>
+<tr>
+<td>通用代码审查</td>
+<td>帮助不大，开发同学不当回事 → 改为领域化审查</td>
+</tr>
+</tbody></table>
+<h3 id="当前局限"><a href="#当前局限" class="headerlink" title="当前局限"></a>当前局限</h3><table>
+<thead>
+<tr>
+<th>局限</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PRD 抓取依赖 Playwright</td>
+<td>钉钉文档结构变化时脚本需同步更新</td>
+</tr>
+<tr>
+<td>规则镜像需人工维护</td>
+<td><code>.cursor/rules/</code> 和 <code>.kiro/steering/</code> 目前是手动镜像，存在不一致风险</td>
+</tr>
+<tr>
+<td>AI 归属判断偶尔误判</td>
+<td>复杂跨仓改动时，路由判断可能不够精准</td>
+</tr>
+<tr>
+<td>PRD 评审深度有限</td>
+<td>AI 能发现缺什么，但不能替代产品补全需求细节</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、三种模式的适用场景"><a href="#六、三种模式的适用场景" class="headerlink" title="六、三种模式的适用场景"></a>六、三种模式的适用场景</h2><p>没有银弹，三种模式各有适合的场景：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>适合什么</th>
+<th>不适合什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>纯人肉</strong></td>
+<td>探索性原型、个人项目、极简改动</td>
+<td>团队协作、多仓架构、长期维护</td>
+</tr>
+<tr>
+<td><strong>Vibe Coding</strong></td>
+<td>一次性脚本、学习练手、简单独立功能</td>
+<td>多仓项目、有规范的团队、需要长期维护的代码</td>
+</tr>
+<tr>
+<td><strong>全流程工程化</strong></td>
+<td>团队项目、多仓架构、长期迭代、多人协作</td>
+<td>一个人临时写个脚本（前期投入不值得）</td>
+</tr>
+</tbody></table>
+<p>判断标准很简单：<strong>这段代码的生命周期有多长？</strong> 只需要跑一次，Vibe Coding 够了；需要活半年以上，全流程工程化才划算。</p>
+<hr>
+<blockquote>
+<p>Vibe Coding 让 AI 替你打字，全流程工程化让 AI 替你思考——而且是有规矩地思考。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E7%BC%96%E7%A8%8B/" rel="tag"># AI编程</a>
+              <a href="/tags/%E7%BB%88%E7%AB%AF/" rel="tag"># 终端</a>
+              <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" rel="tag"># 工程化</a>
+              <a href="/tags/Cursor/" rel="tag"># Cursor</a>
+              <a href="/tags/Claude-Code/" rel="tag"># Claude Code</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/08/15/2021-08-15-%E4%BB%8E%E4%B8%80%E6%AC%A1%E6%9E%B6%E6%9E%84%E9%87%8D%E6%9E%84%E6%B5%85%E8%B0%88%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84%E6%8A%80%E5%B7%A7/" rel="prev" title="从一次架构重构浅谈客户端业务架构技巧">
+      <i class="fa fa-chevron-left"></i> 从一次架构重构浅谈客户端业务架构技巧
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F%EF%BC%9A%E5%90%8C%E4%B8%80%E4%B8%AA%E9%9C%80%E6%B1%82%EF%BC%8C%E4%B8%89%E7%A7%8D%E5%91%BD%E8%BF%90"><span class="nav-number">2.</span> <span class="nav-text">一、三种模式：同一个需求，三种命运</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E5%AE%9A%E4%B9%89"><span class="nav-number">2.1.</span> <span class="nav-text">模式定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%90%E7%8E%AF%E8%8A%82%E5%AF%B9%E6%AF%94"><span class="nav-number">2.2.</span> <span class="nav-text">逐环节对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E4%B8%80%E4%B8%AA%E9%9C%80%E6%B1%82%EF%BC%8C%E4%BB%8E%E6%94%B6%E5%88%B0-PRD-%E5%88%B0%E4%B8%8A%E7%BA%BF"><span class="nav-number">2.3.</span> <span class="nav-text">同一个需求，从收到 PRD 到上线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88-Vibe-Coding-%E4%B8%8D%E5%A4%9F%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">二、为什么 Vibe Coding 不够用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-AI-%E5%86%99%E5%BE%97%E5%BF%AB%E4%BD%86%E6%94%B9%E5%BE%97%E6%85%A2"><span class="nav-number">3.1.</span> <span class="nav-text">1. AI 写得快但改得慢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-AI-%E4%B8%8D%E4%BC%9A%E8%B4%A8%E7%96%91%E9%9C%80%E6%B1%82"><span class="nav-number">3.2.</span> <span class="nav-text">2. AI 不会质疑需求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-AI-%E6%B2%A1%E6%9C%89%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">3.3.</span> <span class="nav-text">3. AI 没有上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-AI-%E5%AE%A1%E6%9F%A5%E8%87%AA%E5%B7%B1%E5%86%99%E7%9A%84%E4%BB%A3%E7%A0%81%E6%98%AF%E6%97%A0%E6%95%88%E7%9A%84"><span class="nav-number">3.4.</span> <span class="nav-text">4. AI 审查自己写的代码是无效的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%B2%A1%E6%9C%89%E6%96%87%E6%A1%A3%E7%9A%84%E4%BB%A3%E7%A0%81%E5%B0%B1%E6%98%AF%E6%8A%80%E6%9C%AF%E5%80%BA"><span class="nav-number">3.5.</span> <span class="nav-text">5. 没有文档的代码就是技术债</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%85%A8%E6%B5%81%E7%A8%8B%E5%B7%A5%E7%A8%8B%E5%8C%96%EF%BC%9A%E5%85%B7%E4%BD%93%E6%80%8E%E4%B9%88%E5%81%9A"><span class="nav-number">4.</span> <span class="nav-text">三、全流程工程化：具体怎么做</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%B7%A5%E5%85%B7%E9%80%89%E5%9E%8B%EF%BC%9A%E4%B8%89%E6%8A%8A%E5%88%80%EF%BC%8C%E4%BD%86%E5%8F%AA%E7%A3%A8%E4%B8%80%E5%9D%97%E7%A3%A8%E5%88%80%E7%9F%B3"><span class="nav-number">4.1.</span> <span class="nav-text">1. 工具选型：三把刀，但只磨一块磨刀石</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%A4%9A%E4%BB%93%E6%9E%B6%E6%9E%84%EF%BC%9A%E8%AE%A9-AI-%E7%9F%A5%E9%81%93%E2%80%9D%E8%BF%99%E4%BA%8B%E4%B8%8D%E5%BD%92%E4%BD%A0%E7%AE%A1%E2%80%9D"><span class="nav-number">4.2.</span> <span class="nav-text">2. 多仓架构：让 AI 知道”这事不归你管”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%9C%80%E6%B1%82%E9%98%B6%E6%AE%B5%EF%BC%9A%E6%8A%8A%E5%A4%96%E9%83%A8%E6%96%87%E6%A1%A3%E6%90%AC%E8%BF%9B-AI-%E7%9A%84%E8%A7%86%E9%87%8E"><span class="nav-number">4.3.</span> <span class="nav-text">3. 需求阶段：把外部文档搬进 AI 的视野</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-PRD-%E8%AF%84%E5%AE%A1%EF%BC%9A%E8%AE%A9-AI-%E5%85%88%E5%AE%A1%E9%9C%80%E6%B1%82%EF%BC%8C%E5%86%8D%E5%86%99%E4%BB%A3%E7%A0%81"><span class="nav-number">4.4.</span> <span class="nav-text">4. PRD 评审：让 AI 先审需求，再写代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%8F%98%E6%9B%B4%E7%AE%A1%E7%90%86%EF%BC%9A%E8%AE%A9%E6%AF%8F%E4%B8%80%E6%AD%A5%E9%83%BD%E6%9C%89%E6%8D%AE%E5%8F%AF%E6%9F%A5"><span class="nav-number">4.5.</span> <span class="nav-text">5. 变更管理：让每一步都有据可查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%B7%A5%E7%A8%8B%E8%87%AA%E5%8A%A8%E5%8C%96%EF%BC%9A%E6%8A%8A%E5%9B%A2%E9%98%9F%E8%A7%84%E8%8C%83%E5%86%99%E8%BF%9B-AI-%E7%9A%84%E8%82%8C%E8%82%89%E8%AE%B0%E5%BF%86"><span class="nav-number">4.6.</span> <span class="nav-text">6. 工程自动化：把团队规范写进 AI 的肌肉记忆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5%EF%BC%9A%E4%B8%8D%E6%98%AF%E9%80%9A%E7%94%A8-review%EF%BC%8C%E6%98%AF%E9%A2%86%E5%9F%9F%E4%B8%93%E5%AE%B6-review"><span class="nav-number">4.7.</span> <span class="nav-text">7. 代码审查：不是通用 review，是领域专家 review</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E5%85%A8%E6%B5%81%E7%A8%8B%E4%B8%B2%E8%B5%B7%E6%9D%A5"><span class="nav-number">4.8.</span> <span class="nav-text">8. 全流程串起来</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%EF%BC%9A%E4%BB%8E%E7%94%A8%E5%88%B0%E5%B7%A5%E7%A8%8B%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">四、学习路线：从用到工程化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E4%B8%80%EF%BC%9A%E4%B8%8A%E6%89%8B%EF%BC%881-2-%E5%91%A8%EF%BC%89%E2%80%94%E2%80%94-%E5%85%88%E7%94%A8%E8%B5%B7%E6%9D%A5"><span class="nav-number">5.1.</span> <span class="nav-text">阶段一：上手（1-2 周）—— 先用起来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E4%BA%8C%EF%BC%9A%E6%8F%90%E6%95%88%EF%BC%882-4-%E5%91%A8%EF%BC%89%E2%80%94%E2%80%94-%E6%94%B9%E5%8F%98%E5%B7%A5%E4%BD%9C%E6%96%B9%E5%BC%8F"><span class="nav-number">5.2.</span> <span class="nav-text">阶段二：提效（2-4 周）—— 改变工作方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E4%B8%89%EF%BC%9A%E6%95%B4%E5%90%88%EF%BC%88%E6%8C%81%E7%BB%AD%EF%BC%89%E2%80%94%E2%80%94-%E8%AE%A9-AI-%E8%9E%8D%E5%85%A5%E5%B7%A5%E5%85%B7%E9%93%BE"><span class="nav-number">5.3.</span> <span class="nav-text">阶段三：整合（持续）—— 让 AI 融入工具链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%AF%E7%A9%BF%E5%A7%8B%E7%BB%88%E7%9A%84%E5%85%B3%E9%94%AE%E8%AE%A4%E7%9F%A5"><span class="nav-number">5.4.</span> <span class="nav-text">贯穿始终的关键认知</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%B8%A9%E8%BF%87%E7%9A%84%E5%9D%91%E5%92%8C%E5%BD%93%E5%89%8D%E5%B1%80%E9%99%90"><span class="nav-number">6.</span> <span class="nav-text">五、踩过的坑和当前局限</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B8%A9%E8%BF%87%E7%9A%84%E5%9D%91"><span class="nav-number">6.1.</span> <span class="nav-text">踩过的坑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E5%89%8D%E5%B1%80%E9%99%90"><span class="nav-number">6.2.</span> <span class="nav-text">当前局限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F%E7%9A%84%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">7.</span> <span class="nav-text">六、三种模式的适用场景</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="宿于松下"
+      src="/assets/img/common/avatar.jpg">
+  <p class="site-author-name" itemprop="name">宿于松下</p>
+  <div class="site-description" itemprop="description">行有不得反求诸己</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shunchengGit" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shunchengGit" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:419187675@qq.com" title="E-Mail → mailto:419187675@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">宿于松下</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
